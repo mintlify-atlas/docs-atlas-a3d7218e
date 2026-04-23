@@ -1,0 +1,162 @@
+---
+title: "v0 draft strategy: show work early, course-correct fast"
+description: "Web Design Skill's v0 draft shows a placeholder layout before full implementation so you can redirect the design direction before any expensive work begins."
+---
+
+The v0 draft is a deliberately incomplete artifact. It shows enough structure, color, and typography to communicate direction — without spending time on content details, complete component states, or motion. The goal is not to impress; it is to create a shared understanding of direction before the expensive implementation work begins.
+
+## The core philosophy
+
+A v0 with explicit assumptions and placeholders is more valuable than a polished v1 in the wrong direction. If the direction is wrong, the polished v1 has to be scrapped entirely. A v0 surfaces that mismatch at the cheapest possible moment.
+
+<Tip>
+The v0 is not a rough draft of the final artifact. It is a communication tool for validating direction. Treat it as a question: "Is this the right direction?" rather than "Here is an early version of the final thing."
+</Tip>
+
+The alternative — holding back a big reveal — is the primary failure mode of AI-generated design. A complete, detailed implementation presented all at once gives the user no opportunity to course-correct early. Any major direction change requires discarding the entire implementation.
+
+## What a v0 includes
+
+<AccordionGroup>
+  <Accordion title="Core layout structure">
+    The v0 establishes the page or screen architecture: how many sections exist, their relative proportions, the grid system, and the overall compositional approach (split pane, card grid, editorial columns, timeline, etc.).
+
+    The structure does not need final content to communicate its intent. Placeholder blocks with accurate aspect ratios and labeled regions are sufficient and preferred.
+  </Accordion>
+
+  <Accordion title="Color and typography tokens">
+    The declared design system tokens are applied in the v0. This is the first visual test of whether the declaration translated to something that feels right on screen.
+
+    If the palette looks wrong in context — too saturated, too muted, wrong mood — that is feedback worth surfacing before any component is fully built.
+  </Accordion>
+
+  <Accordion title="Key module placeholders">
+    Each major UI region is represented with a placeholder that communicates its purpose and approximate content type:
+
+    - `[image]` — photograph or illustration with declared aspect ratio
+    - `[icon]` — icon from the product's icon library
+    - `[chart]` — data visualization (bar, line, scatter, etc.)
+    - `[avatar]` — user or team member image
+
+    Placeholders are labeled and styled to match the design system; they are not bare gray boxes. A well-styled placeholder communicates exactly what needs to be filled in.
+  </Accordion>
+
+  <Accordion title="Design assumptions list">
+    The v0 is accompanied by an explicit list of assumptions made during its creation. This makes the implicit explicit and gives the user clear targets for feedback.
+
+    Example assumptions list:
+    - Assumed a single-column hero with full-width image, not a split-pane layout
+    - Assumed dark navigation bar to create contrast with the light content area
+    - Used Outfit for headings based on the "minimal professional" pairing — can switch if this feels too soft
+    - Assumed three feature cards in a row; layout breaks to a single column below 768px
+  </Accordion>
+</AccordionGroup>
+
+## What a v0 does NOT include
+
+Understanding what to leave out is as important as knowing what to include:
+
+- **Content details** — real copy, actual data, finalized text. Placeholder text and labeled blocks are correct.
+- **Complete component library** — only the key modules present in the primary view. Secondary states, empty states, and edge cases come in the full build.
+- **All interaction states** — hover, focus, active, disabled, loading, and error states are implemented in Step 5, not v0.
+- **Motion** — CSS transitions, entry animations, and micro-interactions are added in the full build after direction is confirmed.
+
+Including these in v0 is a mistake — it increases the cost of direction changes without providing proportionally more feedback signal.
+
+## Placeholder markers
+
+Placeholders in v0 drafts use consistent markers so the user knows exactly what each region will become:
+
+| Placeholder | Meaning |
+|---|---|
+| `[image]` | Photograph or illustration — include aspect ratio (e.g., `[image 16:9]`) |
+| `[icon]` | Icon from the product's icon library |
+| `[chart]` | Data visualization — include type (e.g., `[chart: bar]`) |
+| `[avatar]` | User or team member image — initial circle with color fill is acceptable |
+| `[logo]` | Brand or partner logo — brand name in text with a geometric shape |
+
+<Note>
+A placeholder is more professional than a poorly drawn fake. Placeholders signal "real material needed here." Fabricated SVG icons or invented data signal corner-cutting.
+</Note>
+
+## How to give v0 feedback
+
+When reviewing a v0, focus on direction — not implementation details. The questions to ask:
+
+**Approve if:**
+- The layout structure matches your intended information architecture
+- The color palette and typography feel right for the product and audience
+- The overall compositional approach (editorial, dense, spacious, etc.) is correct
+- The variant directions shown are worth exploring
+
+**Redirect if:**
+- The layout puts emphasis in the wrong place
+- The visual mood is wrong (too corporate, too playful, too editorial, too technical)
+- The font choices feel off for the product category
+- The color palette does not match brand or intent
+
+When redirecting, describe what feels wrong in plain language — design language is better than technical language. "The layout feels too sparse for a data-heavy dashboard" or "the color palette reads as consumer when I need enterprise" gives the AI the signal it needs.
+
+<Warning>
+Do not give detailed implementation feedback on a v0. Feedback like "the button padding is too small" or "the card shadow is too heavy" is premature — these elements are not finalized in v0. Focus on direction.
+</Warning>
+
+## Variant exploration philosophy
+
+The v0 draft step is also where variants are surfaced. Providing multiple variants is not about finding the one right answer — it is about **exhausting possibilities so the user can mix and match**.
+
+The user rarely wants exactly variant A or exactly variant B. They want the layout from A, the color approach from B, and the interaction pattern from C. Showing a range of options makes that kind of synthesis possible.
+
+<Tip>
+Variants should show the user the full spectrum from "safe and functional" to "ambitious and daring." Start conservative, then push progressively toward bold. The user will identify the elements that resonate.
+</Tip>
+
+## The four atomic variant dimensions
+
+Every design can be varied across four independent dimensions. Exploring these dimensions systematically produces variants that are genuinely different, not superficially different:
+
+<Columns cols={2}>
+  <Card title="Layout" icon="layout-grid">
+    How content is organized spatially: split pane, card grid, list view, timeline, editorial columns, full-bleed hero, sidebar navigation. Layout variants change the fundamental information architecture.
+  </Card>
+  <Card title="Visual" icon="palette">
+    Color palette, typography choices, texture, layering, and blend modes. Visual variants can make the same layout feel radically different — from minimal and monochrome to rich and textured.
+  </Card>
+  <Card title="Interaction" icon="mouse-pointer-2">
+    Motion language, hover feedback, navigation patterns, transition styles. Interaction variants change how the artifact feels in use — whether it feels snappy and responsive or slow and deliberate.
+  </Card>
+  <Card title="Creative" icon="lightbulb">
+    Convention-breaking approaches: unconventional metaphors, novel spatial concepts, strong visual themes, unexpected typographic choices. Creative variants show what is possible beyond safe defaults.
+  </Card>
+</Columns>
+
+## Variant progression strategy
+
+Start the first variants conservatively — within the declared design system and the conventions of the product category. Then progressively push toward more distinctive and opinionated directions.
+
+This progression serves a specific purpose: users who see only conservative variants may not know what bolder options are possible. Users who see only bold variants may not trust that practical options exist. Showing both allows genuine selection.
+
+A three-variant progression for a SaaS dashboard might look like:
+
+1. **Variant A — Safe**: Standard two-column layout, restrained color use, conventional card components. Functional and familiar.
+2. **Variant B — Distinctive**: Full-width data strips, typographic hierarchy as the primary organizing principle, minimal chrome.
+3. **Variant C — Bold**: Unconventional grid, strong background color use, large typographic numbers as visual anchors, editorial influence.
+
+The user's actual preference is almost always somewhere across these three — not any single one.
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Workflow overview" icon="list-ordered" href="/workflow/overview">
+    See where the v0 draft fits in the full six-step workflow.
+  </Card>
+  <Card title="Design system declaration" icon="palette" href="/workflow/design-system-declaration">
+    The step that must be approved before the v0 is produced.
+  </Card>
+  <Card title="Placeholder philosophy" icon="square-dashed" href="/principles/placeholder-philosophy">
+    Why placeholders are more professional than fabricated content.
+  </Card>
+  <Card title="Verification checklist" icon="circle-check" href="/workflow/verification-checklist">
+    The full pre-delivery checklist run after the full build is complete.
+  </Card>
+</Columns>

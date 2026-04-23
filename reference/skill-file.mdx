@@ -1,0 +1,209 @@
+---
+title: "SKILL.md file structure and configuration"
+description: "SKILL.md is the core of Web Design Skill: a 400-line system prompt covering scope, workflow, technical specs, design principles, and per-output-type guidelines."
+---
+
+The `SKILL.md` file is not code — it is a structured system prompt that positions an AI coding agent as a top-tier design engineer. Drop it into your project directory and every front-end request the agent handles will be governed by its design philosophy, workflow constraints, and technical rules.
+
+## What SKILL.md is
+
+`SKILL.md` is a plain Markdown file with YAML frontmatter that AI agents (Claude Code, Cursor, and other tools supporting the skill format) automatically load when a task matches the declared trigger. It encodes roughly 400 lines of design principles, technical constraints, and workflow steps that transform AI-generated HTML from "functional" to "visually polished."
+
+It is **not** a library, a framework, or executable code. Nothing imports it at runtime. It is read by the AI before it writes any code.
+
+<Note>
+The companion reference file `references/advanced-patterns.md` (~520 lines) is loaded alongside SKILL.md and provides ready-to-use code templates. See [Advanced patterns](/reference/advanced-patterns) for details.
+</Note>
+
+## File placement
+
+Place the skill directory inside your project root:
+
+<Tabs>
+  <Tab title=".agents/skills (default)">
+    ```
+    your-project/
+    ├── .agents/skills/web-design-engineer/
+    │   ├── SKILL.md
+    │   └── references/
+    │       └── advanced-patterns.md
+    └── ...
+    ```
+  </Tab>
+  <Tab title=".claude/skills (alternative)">
+    ```
+    your-project/
+    ├── .claude/skills/web-design-engineer/
+    │   ├── SKILL.md
+    │   └── references/
+    │       └── advanced-patterns.md
+    └── ...
+    ```
+  </Tab>
+</Tabs>
+
+Some tools use `.claude/skills/` instead of `.agents/skills/`. The file content is identical regardless of placement. Check which directory your agent tool expects.
+
+## Frontmatter format
+
+The frontmatter at the top of `SKILL.md` defines the skill's identity and the natural-language trigger that tells the agent when to activate it:
+
+```yaml
+---
+name: web-design-engineer
+description: |
+  Build high-quality visual Web artifacts using HTML/CSS/JavaScript/React — web pages,
+  landing pages, dashboards, interactive prototypes, HTML slide decks, animated demos,
+  UI mockups, data visualizations, and more.
+  Use this skill whenever the user's request involves a visual, interactive, or
+  front-end deliverable, including:
+  - Creating web pages, landing pages, dashboards, marketing pages
+  - Building interactive prototypes or UI mockups (with device frames)
+  - Building HTML slide decks / presentations
+  - Creating CSS/JS animations or timeline-driven animated demos
+  - Turning design mockups, screenshots, or PRDs into interactive implementations
+  - Data visualization (Chart.js / D3, etc.)
+  - Design system / UI Kit exploration
+  Not applicable: pure back-end logic, CLI tools, data-processing scripts,
+  non-visual code tasks, command-line debugging.
+---
+```
+
+The `description` field is what the agent reads to decide whether to invoke this skill. It describes both what the skill covers and what it does not — ensuring the skill is not triggered for non-visual tasks.
+
+## Major sections
+
+The body of `SKILL.md` after the frontmatter is organized into ten major sections. Each section governs a specific aspect of the agent's behavior.
+
+<AccordionGroup>
+  <Accordion title="Scope">
+    A concise two-line summary of what is and is not applicable. Visual front-end deliverables (pages, prototypes, slides, visualizations, animations, UI mockups, design systems) are in scope. Back-end APIs, CLI tools, data-processing scripts, and other non-visual tasks are explicitly out of scope. This prevents the skill from being applied to unrelated work.
+  </Accordion>
+
+  <Accordion title="Workflow (six steps)">
+    A structured six-step process the agent follows for every task:
+
+    <Steps>
+      <Step title="Understand requirements">
+        Decide whether to ask questions based on available context. Avoid firing off long question lists when the brief already contains enough information.
+      </Step>
+      <Step title="Gather design context">
+        Collect reference materials in priority order — user-provided assets first, then existing product pages, then industry references, then explicit acknowledgment that work is starting from scratch.
+      </Step>
+      <Step title="Declare the design system">
+        Before writing any code, articulate the design decisions in Markdown and let the user confirm: color palette, typography, spacing system, border-radius strategy, shadow hierarchy, motion style.
+      </Step>
+      <Step title="Show a v0 draft early">
+        Deliver a viewable draft with placeholders and core layout tokens before building full components. The goal is early course-correction, not a big reveal.
+      </Step>
+      <Step title="Full build">
+        Write complete components, states, and motion after v0 is approved. Pause at any significant decision point rather than silently pushing through.
+      </Step>
+      <Step title="Verification">
+        Walk through the pre-delivery checklist item by item before considering the work done.
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="Technical Specifications">
+    Four sub-sections covering the concrete code rules:
+
+    - **HTML file structure** — the required `<!DOCTYPE html>` boilerplate with `<style>` in `<head>` and `<script>` before `</body>`
+    - **React + Babel (inline JSX)** — pinned CDN versions for React 18.3.1 and Babel 7.29.0, plus three non-negotiable hard rules (no global `styles` object, no cross-script scope sharing without `window` export, no `scrollIntoView`)
+    - **CSS best practices** — CSS Grid + Flexbox, CSS custom properties for tokens, `oklch()` for color derivation, `clamp()` for fluid typography, `@container` queries, and media queries for color scheme and reduced motion preferences
+    - **File management** — descriptive filenames, splitting files over 1000 lines into multiple JSX files, version suffixes for major revisions, single-file + Tweaks pattern for variants
+  </Accordion>
+
+  <Accordion title="Design Principles">
+    Four principle areas that shape visual decision-making:
+
+    - **Anti-clichés** — an explicit blocklist of patterns that mark output as "obviously AI-generated": purple-pink gradients, left-border accent cards, emoji as icons, overused fonts (Inter, Roboto, Arial, Fraunces, system-ui), fabricated stats, and fake logo walls
+    - **Emoji rules** — no emoji by default; only use them when the target brand itself uses them
+    - **Placeholder philosophy** — use honest placeholder markers (`[icon]`, initial-letter circles, aspect-ratio cards) instead of poorly drawn SVG fakes
+    - **Aim to stun** — bold type-size contrast, unconventional layouts, advanced CSS properties (`backdrop-filter`, `mix-blend-mode`, `mask`) to create memorable moments
+  </Accordion>
+
+  <Accordion title="Output Type Guidelines">
+    Per-output-type rules covering:
+
+    - **Interactive prototypes** — no title screen, device frames for realism, at least three Tweaks-exposed variants, full state coverage
+    - **HTML slide decks** — fixed 1920×1080 canvas, JS `transform: scale()` for viewport fitting, keyboard navigation, `localStorage` position persistence, 1-indexed slide labels
+    - **Data visualization dashboards** — Chart.js or D3.js via CDN, `ResizeObserver` for responsive containers, dark/light toggle, high data-ink ratio
+    - **Animation/video demos** — four-tier animation complexity ladder (CSS → React state → custom timeline engine → Popmotion fallback), play/pause and scrubber required, no title screens
+    - **Static visual comparison** — design canvas for side-by-side comparisons rather than separate files
+  </Accordion>
+
+  <Accordion title="Variant Exploration Philosophy">
+    Variants are for exhausting possibilities so the user can mix and match, not for delivering a single "perfect" option. The agent explores at least four atomic variant dimensions — layout, visual, interaction, and creative — starting conservatively and progressively pushing toward bolder, convention-breaking options.
+  </Accordion>
+
+  <Accordion title="Tweaks Panel">
+    A floating bottom-right panel that exposes live design parameter controls (theme color, font size, dark mode, spacing, animation toggles, component variants) directly inside the delivered artifact. The panel is labeled "Tweaks", fully hidden when closed, and used in multi-variant scenarios instead of creating separate files. The agent adds 1–2 creative Tweaks by default even when not requested.
+  </Accordion>
+
+  <Accordion title="Common CDN Resources">
+    A tiered CDN resource policy with three tiers: resources to use when the scenario clearly requires them (Chart.js, D3.js, Google Fonts), resources to consider only when explicitly requested or for throwaway prototypes (Tailwind CSS, Lucide Icons), and the pinned React + Babel scripts used in every React project. See [CDN resources](/reference/cdn-resources) for the full list.
+  </Accordion>
+
+  <Accordion title="Pre-delivery Checklist">
+    Eleven items the agent must verify before declaring work complete:
+
+    - No browser console errors or warnings
+    - Correct rendering across target viewports
+    - Interactive states for all components (hover, focus, active, disabled, loading, empty, error)
+    - No text overflow; `text-wrap: pretty` applied
+    - All colors from the declared design system, no rogue hues
+    - No `scrollIntoView` usage
+    - No global `const styles = {...}` in React projects
+    - No AI clichés
+    - No filler content or fabricated data
+    - Semantic naming and clean structure
+    - Visual quality at Dribbble/Behance showcase level
+  </Accordion>
+
+  <Accordion title="Collaboration guidelines">
+    Five communication norms: show work-in-progress early, explain decisions using design language (not technical language), ask for clarification on ambiguous feedback, offer variants to show the boundaries of what's possible, and keep summaries focused on important caveats and next steps rather than recapping completed work.
+  </Accordion>
+</AccordionGroup>
+
+## The companion reference file
+
+`references/advanced-patterns.md` (~520 lines) contains ready-to-use code templates that the agent loads alongside `SKILL.md`. It covers:
+
+- Responsive slide engine with `scaleStage()` auto-fit and localStorage navigation
+- Device simulation frames (iPhone, Android, browser window, macOS window)
+- Tweaks panel implementation with the full React component
+- Animation timeline engine (`useTime`, `Easing`, `interpolate`)
+- Design canvas for multi-option side-by-side comparisons
+- Dark mode toggle with `ThemeProvider` and `ThemeContext`
+- Data visualization templates with Chart.js quick start
+- oklch-based color system with CSS custom property patterns
+- Color × font pairing reference table
+
+See [Advanced patterns](/reference/advanced-patterns) for full details and code snippets.
+
+## Customizing SKILL.md for your project
+
+The skill is designed to be customized. Common modifications:
+
+<AccordionGroup>
+  <Accordion title="Restrict the font list">
+    If your project uses a specific font, add it to the "always use" list in the Typography section and remove fonts that conflict with your brand from the recommendations.
+  </Accordion>
+
+  <Accordion title="Add project-specific color tokens">
+    Insert your brand's primary color values directly into the Design System Declaration section so the agent always starts from your palette instead of the generic curated pairings.
+  </Accordion>
+
+  <Accordion title="Change the default output type">
+    If your project only produces one output type (e.g., only slide decks), remove the other Output Type Guidelines sections to reduce noise and sharpen the agent's focus.
+  </Accordion>
+
+  <Accordion title="Add component-specific rules">
+    For projects with an existing component library, add a section documenting your components so the agent re-uses them rather than building new ones from scratch.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+When adding project-specific rules, place them near the top of the file — after the Scope section and before the Workflow section. The agent reads the file top-to-bottom, so earlier context carries more weight.
+</Tip>

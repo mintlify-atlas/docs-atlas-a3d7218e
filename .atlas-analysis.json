@@ -1,0 +1,94 @@
+{
+  "projectType": "general",
+  "projectName": "Web Design Skill",
+  "projectDescription": "A reusable AI agent skill (structured system prompt) that transforms AI-generated web pages from functional to stunning by injecting design taste, anti-cliché rules, oklch color theory, and a six-step design workflow.",
+  "theme": "willow",
+  "primaryColor": "#ce7152",
+  "lightColor": "#764e3f",
+  "darkColor": "#34342c",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "how-it-works"
+            ]
+          },
+          {
+            "group": "Design Principles",
+            "pages": [
+              "principles/anti-ai-cliches",
+              "principles/oklch-color-system",
+              "principles/typography-and-fonts",
+              "principles/placeholder-philosophy"
+            ]
+          },
+          {
+            "group": "Workflow",
+            "pages": [
+              "workflow/overview",
+              "workflow/design-system-declaration",
+              "workflow/v0-draft-strategy",
+              "workflow/verification-checklist"
+            ]
+          },
+          {
+            "group": "Output Types",
+            "pages": [
+              "output-types/web-pages",
+              "output-types/interactive-prototypes",
+              "output-types/slide-decks",
+              "output-types/data-visualizations",
+              "output-types/animations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Skill Reference",
+            "pages": [
+              "reference/skill-file",
+              "reference/color-font-pairings",
+              "reference/advanced-patterns",
+              "reference/cdn-resources"
+            ]
+          },
+          {
+            "group": "Examples",
+            "pages": [
+              "examples/space-museum",
+              "examples/photographer-portfolio"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Anti-cliché rules: explicit blocklist of overused AI design patterns (purple-pink gradients, Inter font, emoji icons, fake testimonials)",
+    "Design system declaration step: forces AI to articulate color, typography, spacing, and motion choices before writing code",
+    "oklch color theory: perceptually uniform color derivation instead of random hex guessing",
+    "Six curated color × font pairings for common use cases (Modern tech, Elegant editorial, Premium brand, etc.)",
+    "Placeholder philosophy: professional markers for missing assets instead of poorly drawn SVG fakes",
+    "Six-step structured workflow from requirements gathering through verification",
+    "Compatible with Claude Code, Cursor, and any AI agent supporting the SKILL.md format",
+    "Advanced pattern library with ready-to-use code templates for slides, animations, device frames, and more"
+  ],
+  "publicApiSurface": [
+    "SKILL.md — main skill definition file (~400 lines) placed in .agents/skills/web-design-engineer/",
+    "references/advanced-patterns.md — code template library (~520 lines) for slides, device frames, Tweaks panel, animation timeline, dark mode, oklch color system",
+    "Six-step workflow: Understand requirements → Gather design context → Declare design system → Show v0 draft → Full build → Verify",
+    "Anti-AI cliché checklist for gradient backgrounds, emoji abuse, left-border accent cards, overused fonts",
+    "oklch color derivation system for perceptually uniform palettes",
+    "Color × font pairing table: Modern tech (Blue-violet + Space Grotesk), Elegant editorial (Warm brown + Newsreader), Premium brand (Near-black + Sora), Lively consumer (Coral + Plus Jakarta Sans), Minimal professional (Teal-blue + Outfit), Artisan warmth (Caramel + Caveat)",
+    "Pre-delivery checklist for verifying output quality"
+  ]
+}

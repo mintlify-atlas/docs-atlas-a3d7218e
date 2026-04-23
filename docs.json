@@ -1,122 +1,88 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Web Design Skill",
+  "theme": "willow",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#ce7152",
+    "light": "#764e3f",
+    "dark": "#34342c"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "https://media.brand.dev/1143b262-8714-4abf-9baf-e1e5685679cb.png",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/ConardLi/web-design-skill"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/ConardLi/web-design-skill"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Get Started",
             "pages": [
-              "index",
+              "introduction",
               "quickstart",
-              "development"
+              "how-it-works"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Design Principles",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "principles/anti-ai-cliches",
+              "principles/oklch-color-system",
+              "principles/typography-and-fonts",
+              "principles/placeholder-philosophy"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Workflow",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "workflow/overview",
+              "workflow/design-system-declaration",
+              "workflow/v0-draft-strategy",
+              "workflow/verification-checklist"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Output Types",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "output-types/web-pages",
+              "output-types/interactive-prototypes",
+              "output-types/slide-decks",
+              "output-types/data-visualizations",
+              "output-types/animations"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Skill Reference",
             "pages": [
-              "api-reference/introduction"
+              "reference/skill-file",
+              "reference/color-font-pairings",
+              "reference/advanced-patterns",
+              "reference/cdn-resources"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Examples",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "examples/space-museum",
+              "examples/photographer-portfolio"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

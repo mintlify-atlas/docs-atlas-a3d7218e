@@ -1,97 +1,71 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Web Design Skill: From Functional to Stunning"
+description: "A reusable AI agent skill that transforms AI-generated web pages from generic to exceptional using design taste, oklch colors, and structured workflows."
 ---
 
-## Setting up
+Web Design Skill is a structured system prompt (SKILL.md) you drop into any AI coding agent — Claude Code, Cursor, or any tool supporting the SKILL.md format — to dramatically upgrade the design quality of every HTML/CSS/JavaScript artifact it produces.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Add the skill to your project in under two minutes and see the difference immediately.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="How It Works" icon="lightbulb" href="/how-it-works">
+    Understand the six-step workflow and core design philosophy behind the skill.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Design Principles" icon="palette" href="/principles/anti-ai-cliches">
+    Explore the anti-cliché rules, oklch color system, and typography guidelines.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Reference" icon="book" href="/reference/skill-file">
+    Browse the full skill file, color pairings, and advanced code patterns.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## The problem it solves
 
-Everything you need to create world-class documentation.
+Modern LLMs can produce functional web pages from a simple prompt. But their output converges on the same aesthetic: Inter font, blue primary buttons, purple-pink gradients, large-radius cards, emoji as icons, and fabricated testimonials. Technically correct, visually generic.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+Web Design Skill injects **design taste** into the AI's decision-making process — forcing it to declare a coherent design system, avoid overused patterns, and derive colors with perceptual precision before writing a single line of code.
 
-## Need inspiration?
+## What you get
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<CardGroup cols={2}>
+  <Card title="Anti-cliché rules" icon="ban" href="/principles/anti-ai-cliches">
+    An explicit blocklist banning purple-pink gradients, Inter font, emoji icons, and fake testimonials.
+  </Card>
+  <Card title="oklch color system" icon="droplet" href="/principles/oklch-color-system">
+    Perceptually uniform color derivation so lightness values actually look equal to the human eye.
+  </Card>
+  <Card title="Six-step workflow" icon="list-check" href="/workflow/overview">
+    From requirements gathering through v0 draft to final verification — no more big-reveal surprises.
+  </Card>
+  <Card title="Color × font pairings" icon="font" href="/reference/color-font-pairings">
+    Six pre-validated visual systems covering SaaS, editorial, luxury, consumer, and more.
+  </Card>
+  <Card title="Placeholder philosophy" icon="image" href="/principles/placeholder-philosophy">
+    Honest placeholder markers instead of poorly drawn SVG fakes.
+  </Card>
+  <Card title="Advanced patterns" icon="code" href="/reference/advanced-patterns">
+    Ready-to-use templates for slides, device frames, animations, and data visualizations.
+  </Card>
+</CardGroup>
+
+## Getting started
+
+<Steps>
+  <Step title="Copy the skill directory">
+    Place `.agents/skills/web-design-engineer/` (containing `SKILL.md` and `references/advanced-patterns.md`) into your project root.
+  </Step>
+  <Step title="Start your AI agent">
+    Open Claude Code, Cursor, or your preferred agent in the project directory. The agent picks up the skill automatically when your request involves visual front-end work.
+  </Step>
+  <Step title="Request a visual artifact">
+    Ask for a web page, slide deck, dashboard, or prototype. The skill activates and guides the agent through the six-step design workflow.
+  </Step>
+  <Step title="Review the design declaration">
+    Before writing code, the agent declares its color palette, typography, spacing, and motion choices. Approve or redirect before a single line is written.
+  </Step>
+</Steps>
+
+<Note>
+  Some tools use `.claude/skills/` instead of `.agents/skills/`. The skill files are identical — place them in whichever directory your agent expects.
+</Note>

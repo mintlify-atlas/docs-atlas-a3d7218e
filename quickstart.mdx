@@ -1,80 +1,122 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Get started with Web Design Skill"
+description: "Learn how to install the Web Design Skill into your AI coding agent project and generate your first high-quality web artifact in under five minutes."
 ---
 
-## Get started in three steps
+Web Design Skill is a drop-in skill file — there is no package to install, no CLI to configure, and no account to create. You copy two files into your project, and your agent picks them up automatically the next time you make a front-end request.
 
-Get your documentation site running locally and make your first customization.
+## File structure
 
-### Step 1: Set up your local environment
+Create the following directory structure inside your project:
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+```text
+your-project/
+├── .agents/skills/web-design-engineer/
+│   ├── SKILL.md
+│   └── references/
+│       └── advanced-patterns.md
+└── ...
+```
 
-### Step 2: Deploy your changes
+<Note>
+Some tools use `.claude/skills/` instead of `.agents/skills/`. Place the files in whichever directory your agent expects. The file content is identical regardless of location.
+</Note>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+## Installation steps
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+<Steps>
+  <Step title="Copy the skill files">
+    Clone or download the [web-design-skill repository](https://github.com/ConardLi/web-design-skill) and copy the two skill files into your project:
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    ```bash
+    # Clone the repository
+    git clone https://github.com/ConardLi/web-design-skill.git
 
-### Step 3: Go live
+    # Copy the skill directory into your project
+    cp -r web-design-skill/.agents your-project/
+    ```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    Your project should now contain:
+
+    ```text
+    your-project/
+    ├── .agents/skills/web-design-engineer/
+    │   ├── SKILL.md
+    │   └── references/
+    │       └── advanced-patterns.md
+    ```
+  </Step>
+
+  <Step title="Start your agent">
+    Open your project in Claude Code, Cursor, or any SKILL.md-compatible agent. The agent will read the skill file automatically when you make a request that involves visual or interactive front-end work.
+
+    No additional configuration is required. The skill activates based on the nature of your request — you do not need to reference the file explicitly.
+  </Step>
+
+  <Step title="Request an artifact">
+    Write a prompt that describes the visual or interactive output you want. The skill applies whenever your intent is to produce something visual, interactive, or presentational — even if you don't use the words "HTML" or "web page."
+
+    Example prompt:
+
+    ```text
+    Build a homepage for an independent photographer's portfolio. The feel should be
+    editorial and minimal — restrained palette, strong typography, generous whitespace.
+    Include a hero image area, a selected works grid, an about section, and a contact footer.
+    ```
+
+    The agent will recognize this as a front-end deliverable and activate the Web Design Skill workflow.
+  </Step>
+
+  <Step title="Approve the design declaration">
+    Before writing any code, the agent outputs a design system declaration in Markdown for you to review. This is Step 3 of the six-step workflow — the agent articulates its color, typography, spacing, and motion choices before committing to them in code.
+
+    A typical declaration looks like:
+
+    ```markdown
+    Design Decisions:
+    - Color palette: Paper-warm light (#f2efe8) primary background, ink-dark (#161513) text,
+      no accent color — extremely restrained two-tone palette
+    - Typography: Instrument Serif (display headings) + Space Grotesk (UI, captions)
+    - Spacing system: 8px base unit, major sections at 120px vertical rhythm
+    - Border-radius strategy: sharp (0–4px) — avoids the large-radius card cliché
+    - Shadow hierarchy: none — depth created through color contrast and whitespace alone
+    - Motion style: slow, film-like — Ken Burns on hero (24s), 600ms ease-out entry animations
+    ```
+
+    Review the declaration and confirm to proceed, or give feedback to adjust the direction before a line of code is written. This is the most efficient moment to course-correct.
+  </Step>
+</Steps>
+
+## What output types the skill covers
+
+The skill applies to any visual or interactive front-end deliverable:
+
+| Output type | Examples |
+|---|---|
+| Web pages and landing pages | Marketing sites, product pages, portfolios |
+| Interactive prototypes | Clickable app mockups with device frames (iPhone, browser window) |
+| HTML slide decks | 1920×1080 presentations with keyboard navigation |
+| Data visualizations | Dashboards built with Chart.js or D3.js |
+| Animations | CSS/JS motion design, timeline-driven demos with play/pause scrubber |
+| Design systems | Token exploration, component variants, side-by-side design canvases |
+
+<Tip>
+If your request involves something visual — even if it's a quick throwaway prototype or a design comparison — the skill will engage. You do not need to explicitly mention HTML or the skill name.
+</Tip>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+<Columns cols={2}>
+  <Card title="How it works" icon="gear" href="/how-it-works">
+    Understand the six-step workflow and design mechanisms in detail.
+  </Card>
+  <Card title="Anti-AI clichés" icon="ban" href="/principles/anti-ai-cliches">
+    See the full list of patterns the skill actively avoids.
+  </Card>
+  <Card title="Design system declaration" icon="pen-line" href="/workflow/design-system-declaration">
+    Learn how the pre-code declaration step works and why it matters.
+  </Card>
+  <Card title="v0 draft strategy" icon="eye" href="/workflow/v0-draft-strategy">
+    Understand why showing an early draft beats a polished big reveal.
+  </Card>
+</Columns>

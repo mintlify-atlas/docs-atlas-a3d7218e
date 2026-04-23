@@ -1,0 +1,114 @@
+---
+title: "Six-step design workflow overview"
+description: "Web Design Skill's six-step workflow surfaces direction decisions before code is written, preventing the big-reveal failures common in AI-generated design work."
+---
+
+Web Design Skill imposes a deliberate process on every visual artifact. Rather than generating a polished v1 in one shot and hoping it lands, the workflow surfaces direction early — before costly implementation work begins. The result is fewer "big reveal" failures, faster iteration, and output that consistently meets a Dribbble-level quality bar.
+
+## Why a structured workflow matters
+
+AI-generated design can fail in two distinct ways: technically broken, or directionally wrong. The first is easy to spot and fix. The second is expensive — a fully implemented component library or slide deck that moves in the wrong visual direction has to be scrapped entirely.
+
+The six-step workflow addresses the second failure mode directly. By declaring design tokens in plain language before writing code, and by surfacing a rough v0 layout for review before investing in full implementation, the process creates natural checkpoints where course-correction is cheap.
+
+<Tip>
+A v0 with explicit assumptions and placeholders is more valuable than a "perfect v1" that took three times as long — if the direction is wrong, the perfect v1 has to be discarded.
+</Tip>
+
+## The six-step workflow
+
+<Steps>
+  <Step title="Understand requirements">
+    Decide whether to ask questions based on what has already been provided. The rule is not to mechanically fire off a list of questions on every request — ask only when the information gap would materially affect the design direction.
+
+    | Scenario | Ask? |
+    |---|---|
+    | "Make a deck" (no PRD, no audience) | Ask extensively: audience, duration, tone, variants |
+    | "Use this PRD to make a 10-min deck for Eng All Hands" | No — enough info, start building |
+    | "Turn this screenshot into an interactive prototype" | Only if the intended interactions are unclear |
+    | "Make 6 slides about the history of butter" | Yes — at minimum ask about tone and audience |
+    | "Design onboarding for my food-delivery app" | Ask heavily: users, flows, brand, variants |
+    | "Recreate the composer UI from this codebase" | No — read the code directly |
+
+    When questions are warranted, probe these areas as needed: product context and target users, output type and fidelity, variation dimensions, and constraints such as responsive breakpoints or accessibility requirements.
+  </Step>
+
+  <Step title="Gather design context">
+    Good design is rooted in existing context. Never start from thin air. Use this priority order:
+
+    1. **Resources the user provides** — screenshots, Figma files, codebases, UI kits. Read them thoroughly and extract tokens.
+    2. **Existing pages of the user's product** — proactively ask whether you can review them.
+    3. **Industry best practices** — ask which brands or products to use as reference.
+    4. **Starting from scratch** — explicitly tell the user that "no reference will affect the final quality," then establish a temporary system based on industry best practices.
+
+    When analyzing reference materials, focus on: color system, typography scheme, spacing system, border-radius strategy, shadow hierarchy, motion style, component density, and copywriting tone.
+
+    <Note>
+      When the user provides both a codebase and screenshots, invest effort in reading source code and extracting design tokens. Rebuilding from code yields far higher quality than guessing from screenshots.
+    </Note>
+  </Step>
+
+  <Step title="Declare the design system">
+    Before writing the first line of code, articulate the complete design system in Markdown and let the user confirm before proceeding. This step catches direction mismatches at the cheapest possible moment — a paragraph of text, not a hundred lines of CSS.
+
+    The declaration covers: color palette, typography, spacing system, border-radius strategy, shadow hierarchy, and motion style. See the [design system declaration guide](/workflow/design-system-declaration) for the full format and field-by-field explanation.
+  </Step>
+
+  <Step title="Show a v0 draft early">
+    Before writing full components, assemble a "viewable v0" using placeholders, key layout structure, and the declared design system tokens. The goal is to let the user validate tone, layout direction, and variant directions before any detailed implementation work begins.
+
+    A v0 includes core structure, color and typography tokens, and key module placeholders marked with explicit labels (`[image]`, `[icon]`, `[chart]`, `[avatar]`), along with a list of design assumptions. It does not include content details, a complete component library, all interaction states, or motion.
+
+    See the [v0 draft strategy guide](/workflow/v0-draft-strategy) for the full approach to placeholders, variant exploration, and how to give feedback on a v0.
+  </Step>
+
+  <Step title="Full build">
+    After the v0 is approved, write full components, add all interaction states, and implement motion. Follow the technical specifications in the skill file.
+
+    If an important decision point arises during the build — for example, choosing between two interaction approaches — pause and confirm rather than silently pushing through. The user knows their product and audience better than the AI does.
+  </Step>
+
+  <Step title="Verify">
+    Walk through the pre-delivery checklist item by item before considering the work done. The checklist covers console errors, responsive rendering, interaction states, color system integrity, React-specific rules, anti-cliché compliance, content integrity, and visual quality.
+
+    See the [verification checklist](/workflow/verification-checklist) for every item with explanations.
+  </Step>
+</Steps>
+
+## When to ask vs. when to build
+
+The decision to ask questions is not binary. It depends on how much information has already been provided and how directionally sensitive the design is. The table above in Step 1 covers the most common scenarios.
+
+The underlying principle: asking is appropriate when missing information would produce a design that misses the mark entirely. It is not appropriate when the request contains enough signal to start building, or when the answer is already visible in the provided codebase or assets.
+
+<Tip>
+When the user provides a codebase, read it directly instead of asking questions about it. Source code is the most reliable source of design truth — the actual CSS custom properties, component structure, and spacing values are all there.
+</Tip>
+
+## Design context priority order
+
+The quality of a design artifact is directly proportional to the quality of its reference material. In order of reliability:
+
+1. **User-provided resources** (screenshots, Figma, codebase, UI kit) — the highest-fidelity source of truth
+2. **Existing product pages** — real evidence of the current visual vocabulary
+3. **Industry best practices** — reference brands and products in the same category
+4. **Starting from scratch** — a last resort; requires explicitly setting user expectations about quality ceiling
+
+When no reference exists, establish a temporary design system grounded in industry best practices for the product category. Do not invent arbitrary tokens.
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Design system declaration" icon="palette" href="/workflow/design-system-declaration">
+    How to declare colors, typography, spacing, and motion before writing code.
+  </Card>
+  <Card title="v0 draft strategy" icon="eye" href="/workflow/v0-draft-strategy">
+    How to show work early and collect direction feedback before full implementation.
+  </Card>
+  <Card title="Verification checklist" icon="circle-check" href="/workflow/verification-checklist">
+    The full pre-delivery checklist every artifact must pass before delivery.
+  </Card>
+  <Card title="Anti-AI clichés" icon="ban" href="/principles/anti-ai-cliches">
+    The explicit blocklist of overused AI design patterns to avoid.
+  </Card>
+</Columns>

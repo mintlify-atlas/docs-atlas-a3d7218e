@@ -1,0 +1,228 @@
+---
+title: "Data visualization dashboards with high data-ink ratio"
+description: "Web Design Skill creates dashboards with Chart.js for standard charts and D3.js for custom ones, applying high data-ink ratio and semantically meaningful color."
+---
+
+Data visualization dashboards produced by Web Design Skill prioritize clarity and honesty over decoration. The core principle is data-ink ratio: every visual element should contribute information. Gridlines, 3D effects, drop shadows, and redundant labels are removed by default. Color encodes meaning, not aesthetics.
+
+## Two library options
+
+The skill selects between two libraries based on the complexity of the visualization required.
+
+<Columns cols={2}>
+  <Card title="Chart.js" icon="chart-bar">
+    Standard chart types: line, bar, pie, doughnut, radar, scatter, bubble. Fast to configure, responsive out of the box, minimal boilerplate. The right choice for most dashboards.
+  </Card>
+  <Card title="D3.js" icon="circle-nodes">
+    Complex custom visualizations: force-directed graphs, tree layouts, geographic maps, custom axes, animated transitions between data states. Choose D3 when Chart.js cannot express the visual.
+  </Card>
+</Columns>
+
+### When to use Chart.js
+
+Chart.js is appropriate when:
+- The chart type is standard (line, bar, pie, area, radar)
+- The dataset is not extremely large
+- Interaction needs are basic (tooltips, click events)
+- Setup time is constrained
+
+### When to use D3.js
+
+D3.js is appropriate when:
+- The visualization type does not exist in Chart.js (network graphs, tree maps, chord diagrams, custom geographic overlays)
+- Fine-grained control over SVG elements is required
+- Animated data transitions need to be frame-accurate
+- Custom axis scales or projections are needed
+
+<Note>
+Both libraries are loaded via CDN and are not included by default. They are only added when the scenario clearly calls for data visualization — not as a general dependency.
+</Note>
+
+## CDN loading
+
+```html
+<!-- Standard charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Complex custom visualizations -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+```
+
+## Chart.js quick start
+
+A basic line chart setup with the skill's preferred configuration — responsive, minimal grid, no legend clutter:
+
+```html
+<canvas id="myChart" width="800" height="400"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('myChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Revenue',
+        data: [12, 19, 3, 5, 2, 3],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+```
+
+Key configuration decisions in this template:
+- `legend: { display: false }` — legend removed; axis labels and tooltips carry the information
+- `x: { grid: { display: false } }` — vertical gridlines removed; they add ink without adding information
+- `y: { grid: { color: '#f0f0f0' } }` — horizontal gridlines are very light, near invisible
+- `tension: 0.4` — slight curve on line charts; straight lines look mechanical
+
+## ResponsiveObserver pattern for chart containers
+
+Chart canvases need explicit container sizing — they do not inherit dimensions from CSS alone. The `ResizeObserver` pattern handles this correctly:
+
+```javascript
+const container = document.getElementById('chart-container');
+const canvas = document.getElementById('myChart');
+
+const ro = new ResizeObserver(entries => {
+  for (const entry of entries) {
+    const { width, height } = entry.contentRect;
+    canvas.width = width;
+    canvas.height = height;
+    // Trigger chart resize if chart instance exists
+    if (window.chartInstance) {
+      window.chartInstance.resize();
+    }
+  }
+});
+
+ro.observe(container);
+```
+
+## Dark and light mode toggle
+
+All dashboard artifacts include a dark/light mode toggle. The implementation reads the system preference on load and provides a manual override:
+
+```javascript
+const ThemeProvider = ({ children }) => {
+  const [dark, setDark] = React.useState(
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  const theme = dark ? {
+    bg: '#0a0a0b',
+    surface: '#18181b',
+    border: '#27272a',
+    text: '#fafafa',
+    textMuted: '#a1a1aa',
+    primary: '#3b82f6'
+  } : {
+    bg: '#ffffff',
+    surface: '#f4f4f5',
+    border: '#e4e4e7',
+    text: '#18181b',
+    textMuted: '#71717a',
+    primary: '#2563eb'
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, dark, setDark }}>
+      <div style={{ background: theme.bg, color: theme.text, minHeight: '100vh' }}>
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  );
+};
+```
+
+Chart.js charts must be re-configured or destroyed and recreated when the theme changes, since color values are baked into the chart instance at creation time.
+
+## Data-ink ratio principle
+
+The data-ink ratio, originally articulated by Edward Tufte, measures how much of a visualization's ink is devoted to actual data versus decorative structure. The skill applies this aggressively:
+
+<AccordionGroup>
+  <Accordion title="Remove gridlines that don't add information">
+    Vertical gridlines on bar and line charts are almost always redundant — the bar heights and point positions communicate the values. Remove them. Horizontal gridlines on y-axes are sometimes useful for reading precise values; keep them only if the chart requires that precision, and make them very light.
+  </Accordion>
+  <Accordion title="Never use 3D effects">
+    3D pie charts, 3D bar charts, and perspective transforms distort the actual data values through foreshortening. A bar that looks 50% of the tallest bar may represent a very different proportion in flat data. 3D is banned in all visualization output.
+  </Accordion>
+  <Accordion title="Remove drop shadows from chart elements">
+    Drop shadows on bars, lines, and data points add visual weight without adding information. They make dense charts harder to read. Remove them from all chart elements.
+  </Accordion>
+  <Accordion title="Minimize legend use">
+    When a chart has one dataset, remove the legend entirely — the axis label or chart title carries the context. When a chart has multiple datasets, prefer direct labeling (labels adjacent to the lines at their endpoints) over a separate legend box that requires eye travel.
+  </Accordion>
+</AccordionGroup>
+
+## Color encoding for semantic meaning
+
+Color in data visualization must carry information, not serve as decoration.
+
+<Columns cols={2}>
+  <Card title="Semantic color" icon="check">
+    - Green for positive/up, red for negative/down
+    - Sequential blue for time-series magnitude
+    - Categorical palettes for distinct groups
+    - Diverging scale for above/below a baseline
+  </Card>
+  <Card title="Decorative color" icon="x">
+    - Random hue per bar in a single-category chart
+    - Brand colors applied to data regardless of meaning
+    - Rainbow gradients applied to ordered data
+    - High-saturation colors for every element equally
+  </Card>
+</Columns>
+
+Color palettes for charts are derived in oklch space, matching the skill's color system:
+
+```css
+:root {
+  /* Categorical: perceptually equidistant hues */
+  --cat-1: oklch(0.55 0.20 250);  /* blue */
+  --cat-2: oklch(0.55 0.20 160);  /* teal */
+  --cat-3: oklch(0.55 0.20 50);   /* amber */
+  --cat-4: oklch(0.55 0.20 330);  /* pink */
+
+  /* Semantic */
+  --positive: oklch(0.55 0.18 145);  /* green */
+  --negative: oklch(0.55 0.22 25);   /* red */
+  --neutral:  oklch(0.55 0.05 250);  /* gray-blue */
+}
+```
+
+<Warning>
+Do not invent new hues outside the declared color system. When more colors are needed for categorical data, derive additional hues by rotating around the oklch hue wheel at equal intervals from the primary — never introduce arbitrary hex values.
+</Warning>
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="oklch color system" icon="palette" href="/principles/oklch-color-system">
+    How the skill derives perceptually uniform color palettes, including categorical and semantic scales.
+  </Card>
+  <Card title="CDN resources" icon="globe" href="/reference/cdn-resources">
+    Pinned CDN URLs for Chart.js, D3.js, and other visualization libraries.
+  </Card>
+  <Card title="Advanced patterns reference" icon="code" href="/reference/advanced-patterns">
+    The full Chart.js quick-start template and dark mode ThemeProvider implementation.
+  </Card>
+  <Card title="Interactive prototypes" icon="mouse-pointer" href="/output-types/interactive-prototypes">
+    Embedding charts inside clickable prototype screens with device frames and Tweaks.
+  </Card>
+</Columns>

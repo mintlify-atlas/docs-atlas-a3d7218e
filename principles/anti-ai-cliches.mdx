@@ -1,0 +1,118 @@
+---
+title: "Avoid AI design clichés: the anti-pattern checklist"
+description: "Web Design Skill bans purple-pink gradients, Inter font, and emoji icons so every artifact looks deliberately crafted rather than assembled from AI defaults."
+---
+
+When an LLM generates a web page without specific design guidance, the output converges on the same aesthetic almost every time: Inter font, blue primary buttons, purple-pink gradients, large-radius cards, emoji bullets, and fabricated testimonials. This convergence isn't a coincidence — it reflects the statistical center of mass of training data. The Web Design Skill breaks this pattern by maintaining an explicit blocklist of these clichés, treating each one as a signal that undermines design credibility.
+
+<Warning>
+The three most common offenders in real-world AI output are **purple-pink-blue gradient backgrounds**, **Inter/Roboto as default fonts**, and **emoji used as icon substitutes**. If your design contains any of these, it will read as AI-generated at a glance.
+</Warning>
+
+## The core problem: LLM aesthetic convergence
+
+LLMs don't have taste — they have statistics. Without a strong design system to anchor decisions, a model defaults to the patterns most frequently associated with "web design" in its training data. The result is a homogeneous aesthetic that experienced designers recognize instantly.
+
+The problem isn't that any single pattern is inherently wrong. It's that the *combination* of these patterns, applied without intentionality, creates a visual signature that signals "assembled by AI rather than designed by a human." That signal damages trust, reduces perceived quality, and makes the artifact look like a prototype rather than a finished product.
+
+## The explicit ban list
+
+<AccordionGroup>
+  <Accordion title="Purple-pink-blue gradient backgrounds">
+    This specific hue progression — often rendered as `linear-gradient(135deg, #6366f1, #ec4899, #3b82f6)` or similar — has become the single most recognizable marker of AI-generated design. It appears in thousands of LLM-generated landing pages, SaaS templates, and marketing sites.
+
+    **Why it's problematic:** The gradient itself isn't inherently bad. The problem is that it's applied indiscriminately, regardless of brand, tone, or context. A fintech dashboard, a food blog, and a developer tool should not share the same visual language.
+
+    **What to do instead:** Derive your color system from the brand's actual hues using oklch. If no brand colors exist, use one of the six validated color × font pairings from the reference guide. Restrained, single-hue palettes almost always read as more intentional than multi-stop gradients.
+  </Accordion>
+
+  <Accordion title="Left-border accent cards">
+    Cards with a colored left border (e.g., `border-left: 4px solid #3b82f6`) used to highlight callouts, stats, or feature points. This pattern is so common in AI output that it now reads as a cliché on its own.
+
+    **Why it's problematic:** The left-border accent is a structural shortcut — it adds visual emphasis without requiring any real compositional thinking. It signals a lack of design investment.
+
+    **What to do instead:** Use background fills, typographic hierarchy, or spacing to create emphasis. If a card truly needs to stand out, consider a full background color change, a subtle shadow elevation, or a distinct layout treatment.
+  </Accordion>
+
+  <Accordion title="Inter, Roboto, Arial, Fraunces, and system-ui">
+    These fonts are banned not because they're bad fonts, but because they're the statistical defaults of AI-generated output. Inter and Roboto appear in the vast majority of LLM-generated interfaces. Arial is a legacy fallback. Fraunces was briefly popular in AI-generated editorial designs. System-ui is the font of no decision.
+
+    **Why it's problematic:** Using these fonts signals that no typography decision was made — the model just picked the safest option. Typography is one of the most powerful tools for conveying brand personality, and defaulting to these fonts wastes that opportunity entirely.
+
+    **What to do instead:** Use the curated font recommendations: Plus Jakarta Sans, Outfit, Space Grotesk, Sora, Newsreader, or Caveat. Each has a distinct personality that can be matched to the project's tone. See the [typography and fonts guide](/principles/typography-and-fonts) for pairing recommendations.
+  </Accordion>
+
+  <Accordion title="Emoji as icon substitutes">
+    Using emoji (🚀 ⚡ ✨ 💡) in place of proper icons when an icon library isn't available.
+
+    **Why it's problematic:** Emoji have platform-specific rendering, inconsistent sizing, and carry connotations from messaging contexts that rarely translate well to professional interfaces. More importantly, using emoji as a fallback signals a shortcut rather than a design decision.
+
+    **What to do instead:** Use a proper placeholder: a square with a label (`[icon]` or `▢`). This signals to stakeholders that a real icon is needed here, and looks far more professional than a rocket emoji in a financial dashboard. See the [placeholder philosophy guide](/principles/placeholder-philosophy) for the full convention.
+  </Accordion>
+
+  <Accordion title="Fabricated stats, fake logo walls, and dummy testimonials">
+    Inventing customer counts, revenue figures, logo walls of companies that haven't endorsed the product, or testimonials from fictional users.
+
+    **Why it's problematic:** Fabricated data damages credibility. If stakeholders or users notice that the logos don't represent real customers or the statistics are invented, the entire artifact loses trust — and so does the person who presented it.
+
+    **What to do instead:** Use honest placeholders. For missing data, ask the user for real figures. For missing logos, show a placeholder slot. For missing testimonials, use a card with `[Customer name]` and `[Company]` rather than fabricating a persona. See [placeholder philosophy](/principles/placeholder-philosophy) for the full framework.
+  </Accordion>
+
+  <Accordion title="Gradient buttons combined with large-radius cards">
+    The specific combination of gradient-filled CTA buttons (`background: linear-gradient(...)`) paired with heavily rounded cards (`border-radius: 16px` or larger) is a hallmark of generic AI-generated SaaS landing pages.
+
+    **Why it's problematic:** This combination has been used so frequently in AI output that it now reads as a template rather than a design. The large radius in particular tends to make interfaces look soft and toy-like rather than purposeful.
+
+    **What to do instead:** Decide on a border-radius strategy as part of the design system declaration, and apply it consistently. A sharp or medium-radius system (`4–8px`) often reads as more intentional. For buttons, solid fills or outlined styles are usually stronger than gradients.
+  </Accordion>
+
+  <Accordion title="Drawing complex graphics with SVG">
+    Attempting to illustrate complex scenes, product screenshots, or decorative graphics using hand-written SVG paths.
+
+    **Why it's problematic:** SVG is well-suited for icons, simple shapes, and data-driven graphics. It is not suited for illustration. AI-generated SVG illustrations look amateurish, are difficult to maintain, and often fail to render correctly across browsers.
+
+    **What to do instead:** Use a placeholder that signals what real asset is needed (e.g., `[Product screenshot — 16:9]`, `[Illustration: onboarding flow]`). This is honest, maintainable, and sets correct expectations for the handoff.
+  </Accordion>
+
+  <Accordion title="Meaningless stats, numbers, and icon spam">
+    Sections filled with invented numbers ("10,000+ customers," "99.9% uptime," "4.8/5 rating") or rows of icons with generic labels ("Fast," "Secure," "Reliable") that add no real information.
+
+    **Why it's problematic:** This pattern — sometimes called "data slop" — creates the visual impression of credibility while communicating nothing. Experienced readers recognize it immediately and it erodes trust in the entire page.
+
+    **What to do instead:** Either use real data provided by the user, or omit the section entirely. Empty whitespace is more professional than fabricated metrics. If the section structure is needed for layout purposes, use honest placeholders with a note asking the user to supply real figures.
+  </Accordion>
+</AccordionGroup>
+
+## What to do instead: a quick reference
+
+| Banned pattern | Replacement approach |
+|---|---|
+| Purple-pink-blue gradients | oklch-derived single-hue palette or validated pairing |
+| Left-border accent cards | Background fills, shadow elevation, or typographic emphasis |
+| Inter / Roboto / Arial / Fraunces | Plus Jakarta Sans, Outfit, Space Grotesk, Sora, Newsreader |
+| Emoji as icons | Square placeholder with label: `[icon]` or `▢` |
+| Fabricated data / testimonials | Honest placeholders; ask user for real content |
+| Gradient button + large-radius card combo | Consistent border-radius system; solid or outlined buttons |
+| Complex SVG illustrations | Placeholder card with asset description and dimensions |
+| Meaningless stats / icon spam | Real data from the user, or omit the section |
+
+<Note>
+These rules apply as defaults. If the brand itself uses emoji (Notion, early Linear), or if gradients are explicitly part of the brand identity, follow the brand — the goal is intentionality, not rigidity.
+</Note>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="oklch color system" icon="palette" href="/principles/oklch-color-system">
+    How to derive perceptually uniform palettes that replace gradient defaults.
+  </Card>
+  <Card title="Typography and fonts" icon="type" href="/principles/typography-and-fonts">
+    Curated font pairings and the banned fonts list explained.
+  </Card>
+  <Card title="Placeholder philosophy" icon="image" href="/principles/placeholder-philosophy">
+    The full framework for handling missing icons, images, and data professionally.
+  </Card>
+  <Card title="Skill file reference" icon="file-code" href="/reference/skill-file">
+    The complete SKILL.md source with all design rules and workflow steps.
+  </Card>
+</CardGroup>

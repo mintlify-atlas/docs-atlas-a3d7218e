@@ -1,0 +1,442 @@
+---
+title: "Advanced code patterns and templates"
+description: "The advanced-patterns.md library has templates for slide engines, device frames, Tweaks panels, animation timelines, and Chart.js quickstarts."
+---
+
+The `references/advanced-patterns.md` file (~520 lines) is a code template library loaded alongside `SKILL.md`. When the agent builds a slide deck, wraps a prototype in a device frame, or implements a live Tweaks panel, it draws the boilerplate from this file rather than writing it from scratch. The templates encode the specific conventions — scaling behavior, postMessage protocol, localStorage persistence — that make delivered artifacts consistent and reusable.
+
+## What's in the file
+
+<Columns cols={2}>
+  <Card title="Responsive slide engine" icon="presentation-screen" href="/reference/advanced-patterns#responsive-slide-engine">
+    Fixed 1920×1080 canvas with JS auto-scaling, keyboard navigation, and localStorage position persistence.
+  </Card>
+  <Card title="Device simulation frames" icon="device-mobile" href="/reference/advanced-patterns#device-simulation-frames">
+    JSX components for iPhone, Android, browser window, and macOS window frames.
+  </Card>
+  <Card title="Tweaks panel" icon="sliders" href="/reference/advanced-patterns#tweaks-panel">
+    Floating dark panel for live design parameter adjustment — theme color, booleans, ranges, and text.
+  </Card>
+  <Card title="Animation timeline engine" icon="play" href="/reference/advanced-patterns#animation-timeline-engine">
+    `useTime` hook + `Easing` library + `interpolate` for scrubber-driven, timeline-choreographed animations.
+  </Card>
+  <Card title="Design canvas" icon="columns-3" href="/reference/advanced-patterns#design-canvas">
+    Side-by-side multi-option comparison grid for visual design reviews.
+  </Card>
+  <Card title="Dark mode toggle" icon="moon" href="/reference/advanced-patterns#dark-mode-toggle">
+    `ThemeProvider` + `ThemeContext` with system preference detection and full token swapping.
+  </Card>
+  <Card title="Data visualization templates" icon="chart-line" href="/reference/advanced-patterns#data-visualization-templates">
+    Chart.js quick start with recommended config (no 3D, minimal gridlines, responsive containers).
+  </Card>
+</Columns>
+
+---
+
+## Responsive slide engine
+
+The slide engine produces a 1920×1080 fixed canvas that auto-fits to any viewport by computing a uniform scale factor. Control buttons are placed **outside** the scaled `.stage` container so they remain usable on small screens.
+
+The `scaleStage` function is the core of the engine:
+
+```javascript
+function scaleStage() {
+  const stage = document.querySelector('.stage');
+  const scaleX = window.innerWidth / 1920;
+  const scaleY = window.innerHeight / 1080;
+  const scale = Math.min(scaleX, scaleY);
+  stage.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', scaleStage);
+scaleStage();
+```
+
+`Math.min(scaleX, scaleY)` ensures the slide fits entirely within the viewport without cropping, producing letterbox bars on either axis as needed.
+
+Slide navigation with `localStorage` persistence:
+
+```javascript
+let current = parseInt(localStorage.getItem('slideIndex') || '0');
+const slides = document.querySelectorAll('.slide');
+
+function showSlide(n) {
+  current = Math.max(0, Math.min(n, slides.length - 1));
+  slides.forEach((s, i) => s.classList.toggle('active', i === current));
+  localStorage.setItem('slideIndex', current);
+  // Display 1-indexed to user, store 0-indexed internally
+  document.querySelector('.slide-counter').textContent =
+    `${current + 1} / ${slides.length}`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') showSlide(current + 1);
+  if (e.key === 'ArrowLeft') showSlide(current - 1);
+});
+
+showSlide(current);
+```
+
+<Note>
+The internal array is 0-indexed but slide numbers displayed to the user are always 1-indexed. `localStorage` preserves position across page refreshes — a critical convenience during iterative design sessions where the designer refreshes frequently.
+</Note>
+
+Each slide section carries a `data-screen-label` attribute for easy reference:
+
+```html
+<section class="slide" data-screen-label="01 Title"> ... </section>
+<section class="slide" data-screen-label="02 Agenda"> ... </section>
+<section class="slide" data-screen-label="03 Problem"> ... </section>
+```
+
+Labels are 1-indexed and match how humans refer to slides in conversation ("slide 5" corresponds to label `05`, never `04`).
+
+---
+
+## Device simulation frames
+
+Device frames add realism to interactive prototypes without requiring any external libraries. All frames are pure JSX.
+
+<Tabs>
+  <Tab title="iPhone frame">
+    ```jsx
+    const IPhoneFrame = ({ children, title = "App" }) => (
+      <div style={{
+        width: 390,
+        height: 844,
+        borderRadius: 48,
+        border: '12px solid #1a1a1a',
+        overflow: 'hidden',
+        position: 'relative',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        background: '#fff'
+      }}>
+        {/* Status bar */}
+        <div style={{
+          height: 54,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          fontSize: 14,
+          fontWeight: 600
+        }}>
+          <span>9:41</span>
+          <div style={{
+            width: 126, height: 34,
+            background: '#1a1a1a',
+            borderRadius: 20,
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            top: 8
+          }} />
+        </div>
+        {/* Content */}
+        <div style={{ height: 'calc(100% - 54px)', overflow: 'auto' }}>
+          {children}
+        </div>
+        {/* Home indicator */}
+        <div style={{
+          position: 'absolute',
+          bottom: 8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 134, height: 5,
+          background: '#1a1a1a',
+          borderRadius: 3
+        }} />
+      </div>
+    );
+    ```
+  </Tab>
+  <Tab title="Browser window frame">
+    ```jsx
+    const BrowserFrame = ({ children, url = "https://example.com" }) => (
+      <div style={{
+        borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        border: '1px solid #e5e5e5'
+      }}>
+        {/* Title bar */}
+        <div style={{
+          background: '#f5f5f5',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          borderBottom: '1px solid #e5e5e5'
+        }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57' }} />
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#febc2e' }} />
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
+          </div>
+          <div style={{
+            flex: 1, background: '#fff',
+            borderRadius: 6, padding: '6px 12px',
+            fontSize: 13, color: '#666',
+            border: '1px solid #e0e0e0'
+          }}>
+            {url}
+          </div>
+        </div>
+        {/* Content */}
+        <div style={{ background: '#fff' }}>{children}</div>
+      </div>
+    );
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Tweaks panel
+
+The Tweaks panel is a floating dark panel in the bottom-right corner that lets users adjust design parameters in real time inside the delivered artifact. The agent adds a Tweaks panel to every interactive prototype — at minimum 1–2 creative parameters even when not requested.
+
+The panel component renders controls based on value type: booleans become checkboxes, numbers become range sliders, hex strings become color pickers, and everything else becomes text inputs.
+
+```jsx
+const TweaksPanel = ({ config, onChange, visible }) => {
+  if (!visible) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', bottom: 20, right: 20,
+      width: 280,
+      background: 'rgba(24, 24, 27, 0.95)',
+      backdropFilter: 'blur(12px)',
+      borderRadius: 12, padding: 16,
+      color: '#fff', fontSize: 13,
+      zIndex: 9999,
+      boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+      border: '1px solid rgba(255,255,255,0.1)'
+    }}>
+      <div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Tweaks</div>
+
+      {Object.entries(config).map(([key, value]) => (
+        <div key={key} style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', marginBottom: 4, opacity: 0.7 }}>
+            {key}
+          </label>
+          {typeof value === 'boolean' ? (
+            <input type="checkbox" checked={value}
+              onChange={e => onChange({ ...config, [key]: e.target.checked })} />
+          ) : typeof value === 'number' ? (
+            <input type="range" min="0" max="100" value={value}
+              onChange={e => onChange({ ...config, [key]: Number(e.target.value) })}
+              style={{ width: '100%' }} />
+          ) : value.startsWith('#') ? (
+            <input type="color" value={value}
+              onChange={e => onChange({ ...config, [key]: e.target.value })} />
+          ) : (
+            <input type="text" value={value}
+              onChange={e => onChange({ ...config, [key]: e.target.value })}
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 4, padding: '4px 8px', color: '#fff'
+              }} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+The `config` object drives the entire panel. A minimal example:
+
+```jsx
+const [tweaks, setTweaks] = React.useState({
+  darkMode: false,
+  accentColor: '#6366f1',
+  density: 50,
+  variant: 'default'
+});
+
+// Render: <TweaksPanel config={tweaks} onChange={setTweaks} visible={panelOpen} />
+```
+
+<Tip>
+The panel is **completely hidden** when `visible` is false, so the design looks final during presentations. The toggle button should be a small, unobtrusive element (a gear icon or "T" label) that does not visually compete with the artifact.
+</Tip>
+
+---
+
+## Animation timeline engine
+
+For timeline-driven demos and video-style animations, the advanced patterns library provides three primitives: `useTime`, `Easing`, and `interpolate`. Together they implement a scrubber-based animation system that does not require any external animation library.
+
+```jsx
+const useTime = (duration = 5000) => {
+  const [time, setTime] = React.useState(0);
+  const [playing, setPlaying] = React.useState(true);
+  const frameRef = React.useRef();
+  const startRef = React.useRef();
+
+  React.useEffect(() => {
+    if (!playing) return;
+    const animate = (timestamp) => {
+      if (!startRef.current) startRef.current = timestamp;
+      const elapsed = (timestamp - startRef.current) % duration;
+      setTime(elapsed / duration); // normalized 0 → 1
+      frameRef.current = requestAnimationFrame(animate);
+    };
+    frameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameRef.current);
+  }, [playing, duration]);
+
+  return { time, playing, setPlaying };
+};
+
+const Easing = {
+  linear:    t => t,
+  easeInOut: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  easeOut:   t => 1 - Math.pow(1 - t, 3),
+  easeIn:    t => t * t * t,
+  spring:    t => 1 - Math.pow(Math.E, -6 * t) * Math.cos(8 * t)
+};
+
+const interpolate = (t, from, to, easing = Easing.easeInOut) => {
+  const progress = easing(Math.max(0, Math.min(1, t)));
+  return from + (to - from) * progress;
+};
+```
+
+`time` is a normalized value from 0 to 1 representing position in the animation cycle. Derive any property by interpolating between a start and end value:
+
+```jsx
+const { time } = useTime(3000); // 3-second loop
+
+const opacity = interpolate(time, 0, 1);               // fade in
+const x       = interpolate(time, -100, 0, Easing.spring); // spring entry
+const scale   = interpolate(time, 0.8, 1, Easing.easeOut); // scale up
+```
+
+For multi-segment choreography, segment the normalized time range:
+
+```jsx
+// Segment 1: 0–40% of total duration
+const seg1 = Math.min(time / 0.4, 1);
+// Segment 2: 40–100% of total duration
+const seg2 = Math.max((time - 0.4) / 0.6, 0);
+
+const titleOpacity = interpolate(seg1, 0, 1);
+const bodyOpacity  = interpolate(seg2, 0, 1);
+```
+
+---
+
+## Design canvas
+
+For pure visual comparisons — button colors, typography choices, card styles — the Design Canvas displays multiple options side by side rather than building a full prototype:
+
+```jsx
+const DesignCanvas = ({ options, columns = 3 }) => (
+  <div style={{
+    display: 'grid',
+    gridTemplateColumns: `repeat(${columns}, 1fr)`,
+    gap: 24, padding: 40,
+    background: '#f8f9fa',
+    minHeight: '100vh'
+  }}>
+    {options.map((option, i) => (
+      <div key={i} style={{
+        background: '#fff', borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{
+          padding: '12px 16px',
+          borderBottom: '1px solid #eee',
+          fontSize: 13, fontWeight: 600, color: '#666'
+        }}>
+          Option {String.fromCharCode(65 + i)}: {option.label}
+        </div>
+        <div style={{ padding: 16 }}>{option.content}</div>
+      </div>
+    ))}
+  </div>
+);
+```
+
+Use a Design Canvas when the comparison is purely visual. Use a full prototype with Tweaks-exposed variants when the comparison involves interactions, flows, or multi-step scenarios.
+
+---
+
+## Dark mode toggle
+
+The `ThemeProvider` pattern reads the system color scheme preference on mount and provides a complete token swap between light and dark:
+
+```jsx
+const ThemeProvider = ({ children }) => {
+  const [dark, setDark] = React.useState(
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  const theme = dark ? {
+    bg: '#0a0a0b', surface: '#18181b', border: '#27272a',
+    text: '#fafafa', textMuted: '#a1a1aa', primary: '#3b82f6'
+  } : {
+    bg: '#ffffff', surface: '#f4f4f5', border: '#e4e4e7',
+    text: '#18181b', textMuted: '#71717a', primary: '#2563eb'
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, dark, setDark }}>
+      <div style={{ background: theme.bg, color: theme.text, minHeight: '100vh' }}>
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  );
+};
+```
+
+Access theme tokens in any child component via `React.useContext(ThemeContext)`. Use the `setDark` function from context to wire up the toggle button.
+
+---
+
+## Data visualization templates
+
+The library includes a Chart.js quick start configured for high data-ink ratio: no 3D effects, minimal gridlines, no default legend when one dataset is present, and a smooth tension curve for line charts.
+
+```html
+<canvas id="myChart" width="800" height="400"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('myChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line', // bar, pie, doughnut, radar, etc.
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Revenue',
+        data: [12, 19, 3, 5, 2, 3],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+```
+
+For complex custom visualizations that Chart.js cannot express, the skill recommends D3.js via `https://d3js.org/d3.v7.min.js`. See [CDN resources](/reference/cdn-resources) for the full library loading guidance.
+
+<Note>
+Some agent environments (such as Claude's artifact preview) provide starter components including slide engines, device frames, and a Tweaks panel directly as part of the environment. In those cases the agent uses the environment-provided versions rather than reproducing the templates from this file.
+</Note>

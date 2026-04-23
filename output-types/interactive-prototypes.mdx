@@ -1,0 +1,306 @@
+---
+title: "Interactive prototypes with device frames"
+description: "Web Design Skill builds hi-fi clickable prototypes with device bezels, full interaction state coverage, and a Tweaks panel for real-time parameter adjustment."
+---
+
+Interactive prototypes produced by Web Design Skill are not wireframes or rough sketches — they are high-fidelity, clickable implementations with realistic device bezels, complete interaction state coverage, and a built-in live parameter panel. The goal is for a prototype to feel indistinguishable from an actual shipping product during a review session.
+
+## What interactive prototypes cover
+
+A prototype artifact typically includes one or more of the following:
+
+- **Clickable app mockups** — screens connected by real interactions, not static images linked together
+- **User flow exploration** — onboarding sequences, checkout paths, settings panels, and other multi-step flows
+- **UI state exploration** — seeing the same component in every condition it can appear in, from default to error
+- **Design variant comparison** — multiple layout, visual, or interaction directions shown side by side or toggled via the Tweaks panel
+
+## Core requirements
+
+### No title screen
+
+Prototypes center in the viewport or fill it with sensible margins immediately. There is no splash screen, loading animation, or cover slide between the user and the prototype. The product appears at once.
+
+### Device frames for realism
+
+Wrapping prototype screens in device bezels grounds them in real-world context and prevents reviewers from evaluating the design as abstract pixels.
+
+<Tabs>
+  <Tab title="iPhone frame">
+    ```jsx
+    const IPhoneFrame = ({ children }) => (
+      <div style={{
+        width: 390,
+        height: 844,
+        borderRadius: 48,
+        border: '12px solid #1a1a1a',
+        overflow: 'hidden',
+        position: 'relative',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        background: '#fff'
+      }}>
+        {/* Status bar */}
+        <div style={{
+          height: 54,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          fontSize: 14,
+          fontWeight: 600
+        }}>
+          <span>9:41</span>
+          <div style={{
+            width: 126, height: 34,
+            background: '#1a1a1a',
+            borderRadius: 20,
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            top: 8
+          }} />
+          <span>⚡ 📶</span>
+        </div>
+        {/* Content */}
+        <div style={{ height: 'calc(100% - 54px)', overflow: 'auto' }}>
+          {children}
+        </div>
+        {/* Home indicator */}
+        <div style={{
+          position: 'absolute',
+          bottom: 8, left: '50%',
+          transform: 'translateX(-50%)',
+          width: 134, height: 5,
+          background: '#1a1a1a',
+          borderRadius: 3
+        }} />
+      </div>
+    );
+    ```
+  </Tab>
+  <Tab title="Browser window frame">
+    ```jsx
+    const BrowserFrame = ({ children, url = "https://example.com" }) => (
+      <div style={{
+        borderRadius: 12,
+        overflow: 'hidden',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+        border: '1px solid #e5e5e5'
+      }}>
+        {/* Title bar */}
+        <div style={{
+          background: '#f5f5f5',
+          padding: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          borderBottom: '1px solid #e5e5e5'
+        }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#ff5f57' }} />
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#febc2e' }} />
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#28c840' }} />
+          </div>
+          <div style={{
+            flex: 1, background: '#fff',
+            borderRadius: 6,
+            padding: '6px 12px',
+            fontSize: 13, color: '#666',
+            border: '1px solid #e0e0e0'
+          }}>
+            {url}
+          </div>
+        </div>
+        <div style={{ background: '#fff' }}>{children}</div>
+      </div>
+    );
+    ```
+  </Tab>
+</Tabs>
+
+Available frame types: iPhone, Android, browser window, macOS window.
+
+### At least 3 variants via the Tweaks panel
+
+Every prototype exposes at least three design variants — toggled from the Tweaks panel rather than as separate files. This keeps the deliverable self-contained and lets reviewers compare directions in the same session without file management.
+
+### Full state coverage
+
+Every interactive component must appear in all states it can occupy:
+
+<Columns cols={2}>
+  <Card title="Component states" icon="layers">
+    Default, hover, active, focus, disabled
+  </Card>
+  <Card title="Data states" icon="database">
+    Loading, empty, error
+  </Card>
+</Columns>
+
+Missing states in a prototype mean the reviewer cannot assess whether the design is production-ready.
+
+## React + Babel CDN setup
+
+Inline JSX prototypes use pinned-version CDN scripts to ensure reproducibility. The `integrity` hashes are recommended; remove them only if the CDN is network-restricted.
+
+```html
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+        integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+        integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+        integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+        crossorigin="anonymous"></script>
+```
+
+<Note>
+Do not add `type="module"` to React CDN script tags — it breaks the Babel transpilation pipeline. Load order must be: React → ReactDOM → Babel → your component files.
+</Note>
+
+## The Tweaks panel system
+
+The Tweaks panel is a floating control surface in the bottom-right corner. It is completely hidden when closed so the prototype looks finished during a presentation, and opens to expose live design parameters.
+
+```jsx
+const TweaksPanel = ({ config, onChange, visible }) => {
+  if (!visible) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 20, right: 20,
+      width: 280,
+      background: 'rgba(24, 24, 27, 0.95)',
+      backdropFilter: 'blur(12px)',
+      borderRadius: 12,
+      padding: 16,
+      color: '#fff',
+      fontSize: 13,
+      zIndex: 9999,
+      boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+      border: '1px solid rgba(255,255,255,0.1)'
+    }}>
+      <div style={{ fontWeight: 600, marginBottom: 12, fontSize: 14 }}>Tweaks</div>
+
+      {Object.entries(config).map(([key, value]) => (
+        <div key={key} style={{ marginBottom: 12 }}>
+          <label style={{ display: 'block', marginBottom: 4, opacity: 0.7 }}>
+            {key}
+          </label>
+          {typeof value === 'boolean' ? (
+            <input type="checkbox" checked={value}
+              onChange={e => onChange({ ...config, [key]: e.target.checked })} />
+          ) : typeof value === 'number' ? (
+            <input type="range" min="0" max="100" value={value} style={{ width: '100%' }}
+              onChange={e => onChange({ ...config, [key]: Number(e.target.value) })} />
+          ) : value.startsWith('#') ? (
+            <input type="color" value={value}
+              onChange={e => onChange({ ...config, [key]: e.target.value })} />
+          ) : (
+            <input type="text" value={value}
+              onChange={e => onChange({ ...config, [key]: e.target.value })}
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: 4, padding: '4px 8px', color: '#fff'
+              }} />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+Design guidelines for the panel:
+- Title is always **"Tweaks"** — consistent label across all prototypes
+- Completely hidden when closed; the design must look final without it
+- In multi-variant prototypes, variants are exposed as dropdowns or toggles inside Tweaks rather than separate files
+- Even when the user does not ask for tweaks, add 1–2 creative parameters by default
+
+## The three hard React rules
+
+These rules are non-negotiable in every React prototype. Violating them produces silent bugs that are difficult to trace.
+
+<Steps>
+  <Step title="Never use `const styles = {}`">
+    Multiple component files sharing `styles` as a global variable name silently overwrite each other. Always namespace with the component name:
+
+    ```jsx
+    // Correct
+    const terminalStyles = { container: { ... }, line: { ... } };
+    const headerStyles = { wrap: { ... } };
+
+    // Wrong — will collide across files
+    const styles = { container: { ... } };
+    ```
+
+    Or use inline `style={{...}}` directly. The variable name `styles` is banned.
+  </Step>
+  <Step title="Export cross-file components via `Object.assign(window, {})`">
+    Separate `<script type="text/babel">` blocks do not share scope — each is compiled independently. To make a component available to other files, explicitly attach it to `window` at the end of the defining file:
+
+    ```jsx
+    function Terminal() { /* ... */ }
+    function Line() { /* ... */ }
+
+    Object.assign(window, { Terminal, Line });
+    ```
+  </Step>
+  <Step title="Never use `scrollIntoView`">
+    In iframe-embedded preview environments, `scrollIntoView` disrupts outer-frame scrolling. Use direct scroll assignments instead:
+
+    ```jsx
+    // Correct
+    element.scrollTop = targetOffset;
+    window.scrollTo({ top: targetOffset, behavior: 'smooth' });
+
+    // Wrong
+    element.scrollIntoView({ behavior: 'smooth' });
+    ```
+  </Step>
+</Steps>
+
+## Variant exploration strategy
+
+Variants are not about delivering the single best option — they are about exhausting the design space so the reviewer can identify which elements resonate and mix them freely.
+
+The skill explores at least four dimensions:
+
+<AccordionGroup>
+  <Accordion title="Layout variants">
+    How the content is organized spatially: split pane, card grid, list view, timeline, full-bleed, sidebar+content. Layout changes should be distinct — not subtle shuffles.
+  </Accordion>
+  <Accordion title="Visual variants">
+    Color palette, typography pairing, texture, layering depth, border-radius strategy. A light minimal variant alongside a dark atmospheric one covers a wide range quickly.
+  </Accordion>
+  <Accordion title="Interaction variants">
+    Motion style, feedback patterns (color shift vs. scale vs. shadow), navigation metaphor (tabs vs. drawer vs. inline expand). Interaction variants change how the product *feels* to use.
+  </Accordion>
+  <Accordion title="Creative variants">
+    Convention-breaking approaches — an unconventional layout metaphor, a strong visual concept, a novel navigation pattern. The first variants should be safe; the last should push boundaries.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Start the first variants safely within the design system, then progressively push boundaries. Show the full spectrum from "safe and functional" to "ambitious and daring." Reviewers pick the elements that resonate most and can ask for a hybrid.
+</Tip>
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Advanced patterns reference" icon="code" href="/reference/advanced-patterns">
+    Full code templates for device frames, Tweaks panel, dark mode, and animation timeline.
+  </Card>
+  <Card title="CDN resources" icon="globe" href="/reference/cdn-resources">
+    Pinned CDN URLs for React, Babel, Chart.js, D3, and other libraries used in prototypes.
+  </Card>
+  <Card title="Animations" icon="play" href="/output-types/animations">
+    Timeline-driven animation engine for adding motion to prototype screens.
+  </Card>
+  <Card title="Photographer portfolio example" icon="camera" href="/examples/photographer-portfolio">
+    A complete prototype with editorial layout, mix-blend-mode navigation, and Ken Burns motion.
+  </Card>
+</Columns>

@@ -1,0 +1,179 @@
+---
+title: "oklch color system: perceptually uniform palettes"
+description: "Web Design Skill derives all colors in oklch, a perceptually uniform space where equal lightness values look equally bright across every hue, unlike HSL or hex."
+---
+
+The oklch color space is a perceptually uniform color model that solves a fundamental problem with older color systems: in HSL or hex-based workflows, colors with identical lightness values look dramatically different in brightness to the human eye. Web Design Skill uses oklch as the foundation for all color work, ensuring that derived palettes are visually coherent rather than numerically identical but perceptually inconsistent.
+
+## Why oklch over HSL
+
+HSL (hue, saturation, lightness) maps colors to a cylinder where the lightness axis is mathematically uniform — but not *perceptually* uniform. A yellow at `hsl(60, 100%, 50%)` appears much brighter than a blue at `hsl(240, 100%, 50%)`, even though both share the same `50%` lightness value. This mismatch causes problems throughout a design system:
+
+- Neutral scales look uneven — some steps feel like a large jump, others barely register
+- Text contrast ratios calculated from HSL lightness don't match perceived contrast
+- Color variants derived by shifting only the lightness channel produce results that look inconsistent
+
+oklch is designed to fix this. It models color based on how human perception actually works, meaning that two colors with the same oklch lightness value will genuinely *look* equally bright, regardless of their hue.
+
+## The oklch syntax
+
+```css
+oklch(lightness chroma hue)
+```
+
+- **Lightness** — a value from `0` (black) to `1` (white). Perceptually uniform: `0.5` always looks like a mid-tone.
+- **Chroma** — colorfulness or saturation, from `0` (gray) to roughly `0.37` (maximum, varies by hue). Neutrals use very low chroma (`0.002–0.02`).
+- **Hue** — the color angle in degrees, `0–360`. `0°` and `360°` are red; `120°` is green; `250°` is blue-violet; `30°` is warm orange-brown.
+
+```css
+oklch(0.55 0.25 250)  /* blue-violet: mid-lightness, high chroma, blue hue */
+oklch(0.98 0.002 250) /* near-white with a very subtle blue tint */
+oklch(0.21 0.014 250) /* near-black neutral */
+```
+
+## How the skill derives color scales
+
+The key insight is to hold the **hue angle constant** while varying lightness and chroma. This produces a scale where every step is a true variant of the same hue — not a different color that happens to be in the same family.
+
+```css
+:root {
+  --primary-h: 250;  /* define once, reuse everywhere */
+
+  --primary:       oklch(0.55 0.25  var(--primary-h));
+  --primary-light: oklch(0.75 0.15  var(--primary-h));
+  --primary-dark:  oklch(0.35 0.20  var(--primary-h));
+
+  /* Neutrals: same hue, near-zero chroma */
+  --gray-50:  oklch(0.98 0.002 var(--primary-h));
+  --gray-100: oklch(0.96 0.004 var(--primary-h));
+  --gray-200: oklch(0.92 0.006 var(--primary-h));
+  --gray-300: oklch(0.87 0.008 var(--primary-h));
+  --gray-400: oklch(0.71 0.010 var(--primary-h));
+  --gray-500: oklch(0.55 0.014 var(--primary-h));
+  --gray-600: oklch(0.45 0.014 var(--primary-h));
+  --gray-700: oklch(0.37 0.014 var(--primary-h));
+  --gray-800: oklch(0.27 0.014 var(--primary-h));
+  --gray-900: oklch(0.21 0.014 var(--primary-h));
+}
+```
+
+Because the neutral scale uses the same hue angle as the primary, the grays carry a subtle warmth or coolness that harmonizes with the brand color — a detail that is nearly impossible to achieve reliably with hex-based neutrals.
+
+## Real token examples from the project
+
+The photographer portfolio demo (`demo2-with-skill.html`) uses this approach to build an extremely restrained two-tone palette rooted in warm, near-neutral hues:
+
+| Token | Value | Role |
+|---|---|---|
+| `paper` | `oklch(0.965 0.018 78)` | Page background — warm off-white |
+| `ink` | `oklch(0.180 0.014 60)` | Primary text — near-black with warmth |
+| `ember` | `oklch(0.700 0.170 42)` | Accent — muted amber-orange |
+
+All three tokens share the warm hue range (`42–78°`). The result is a palette that feels cohesive even at extreme lightness contrast because the underlying hue character is consistent.
+
+```css
+:root {
+  --paper: oklch(0.965 0.018 78);  /* warm off-white background */
+  --ink:   oklch(0.180 0.014 60);  /* near-black text */
+  --ember: oklch(0.700 0.170 42);  /* amber accent */
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+a, .accent {
+  color: var(--ember);
+}
+```
+
+## The "never invent new hues" rule
+
+When a design system needs more colors — hover states, disabled states, secondary surfaces — the rule is to derive them from the existing hue angles rather than picking new ones. Adding a new hue introduces a new color personality into the system, which almost always reads as an inconsistency unless it's a deliberate semantic choice (e.g., green for success, red for error).
+
+<Note>
+Semantic colors (success, warning, error) are the legitimate exception: they carry universal meaning that overrides brand harmony. Even here, it's worth anchoring them to specific hue angles (`145°` for green, `30°` for amber, `15°` for red) rather than using saturated hex values.
+</Note>
+
+Deriving variants stays within the hue while adjusting lightness and chroma:
+
+```css
+/* Button states — all derived from the same hue */
+:root {
+  --btn-h: 250;
+  --btn-default:  oklch(0.55 0.25 var(--btn-h));
+  --btn-hover:    oklch(0.50 0.27 var(--btn-h));  /* slightly darker, more saturated */
+  --btn-active:   oklch(0.45 0.28 var(--btn-h));  /* darker still */
+  --btn-disabled: oklch(0.72 0.08 var(--btn-h));  /* much lighter, desaturated */
+}
+```
+
+## Adapting oklch to any brand color
+
+When a brand color is provided as hex or HSL, convert it to oklch first, then use that value's hue angle as `--primary-h` for the entire system:
+
+<Steps>
+  <Step title="Convert the brand color to oklch">
+    Use a browser DevTools color picker or an online converter to find the oklch equivalent. For example, Tailwind's `blue-600` (`#2563eb`) converts to approximately `oklch(0.55 0.25 264)`.
+  </Step>
+  <Step title="Extract the hue angle">
+    The third value is your `--primary-h`. In this case, `264`.
+  </Step>
+  <Step title="Declare the full scale">
+    Use `--primary-h` as a CSS custom property throughout the token definitions. All variants — lights, darks, neutrals — reference this single variable.
+  </Step>
+  <Step title="Verify perceptual balance">
+    Check that light and dark variants read as expected at their lightness values. Because oklch is perceptually uniform, this should hold automatically — but high-chroma hues (especially yellows and greens) can still push toward the perceived lightness ceiling faster than other hues.
+  </Step>
+</Steps>
+
+## Complete CSS custom property example
+
+```css
+:root {
+  /* Brand hue — change this one value to re-theme the entire system */
+  --hue: 42;
+
+  /* Primary scale */
+  --color-primary-100: oklch(0.95 0.04  var(--hue));
+  --color-primary-200: oklch(0.88 0.08  var(--hue));
+  --color-primary-300: oklch(0.78 0.12  var(--hue));
+  --color-primary-400: oklch(0.68 0.15  var(--hue));
+  --color-primary-500: oklch(0.58 0.17  var(--hue));  /* base */
+  --color-primary-600: oklch(0.48 0.17  var(--hue));
+  --color-primary-700: oklch(0.38 0.15  var(--hue));
+  --color-primary-800: oklch(0.28 0.12  var(--hue));
+  --color-primary-900: oklch(0.18 0.08  var(--hue));
+
+  /* Neutrals — same hue, minimal chroma */
+  --color-neutral-50:  oklch(0.98 0.003 var(--hue));
+  --color-neutral-100: oklch(0.96 0.005 var(--hue));
+  --color-neutral-200: oklch(0.92 0.007 var(--hue));
+  --color-neutral-500: oklch(0.58 0.012 var(--hue));
+  --color-neutral-800: oklch(0.25 0.012 var(--hue));
+  --color-neutral-900: oklch(0.18 0.010 var(--hue));
+
+  /* Semantic — fixed hue angles, not derived from brand */
+  --color-success: oklch(0.60 0.18 145);
+  --color-warning: oklch(0.72 0.18  80);
+  --color-error:   oklch(0.58 0.22  15);
+}
+```
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Color and font pairings" icon="swatches" href="/reference/color-font-pairings">
+    Six validated oklch color values paired with font recommendations for common use cases.
+  </Card>
+  <Card title="Anti-AI clichés checklist" icon="ban" href="/principles/anti-ai-cliches">
+    Why gradient backgrounds are banned and what to do instead.
+  </Card>
+  <Card title="Typography and fonts" icon="type" href="/principles/typography-and-fonts">
+    Font selection principles that complement the oklch color system.
+  </Card>
+  <Card title="Advanced patterns reference" icon="code" href="/reference/advanced-patterns">
+    Full CSS custom property templates and color system code examples.
+  </Card>
+</CardGroup>

@@ -1,0 +1,247 @@
+---
+title: "Web pages and landing pages with editorial quality"
+description: "Web Design Skill creates marketing sites, portfolios, and product pages with editorial layouts, restrained palettes, and strong typographic hierarchy."
+---
+
+Web Design Skill produces web pages that go well beyond functional HTML. The output targets the aesthetic quality of editorial magazines and design-forward studios — restrained color palettes, intentional whitespace, and typographic compositions that guide the eye rather than overwhelm it. Every element earns its place; nothing is stuffed in to fill space.
+
+## What types of web pages the skill produces
+
+The skill handles the full range of front-end page deliverables:
+
+<Columns cols={2}>
+  <Card title="Marketing sites" icon="megaphone">
+    Hero sections, feature grids, pricing tables, testimonials, and CTAs — structured to convert while looking credible.
+  </Card>
+  <Card title="Product pages" icon="box">
+    Feature breakdowns, comparison sections, and specification layouts that communicate value without resorting to visual noise.
+  </Card>
+  <Card title="Portfolios" icon="image">
+    Case study layouts, project galleries, and about pages that let the work lead and the type support.
+  </Card>
+  <Card title="Blogs and editorial" icon="newspaper">
+    Long-form article templates with reading-optimized line lengths, clear typographic hierarchy, and pull-quote treatment.
+  </Card>
+</Columns>
+
+## Design approach: what distinguishes the output
+
+The contrast between skill-assisted and default AI output is significant. The README documents a side-by-side comparison using the Space Exploration Museum prompt:
+
+<Columns cols={2}>
+  <Card title="Without the skill" icon="x">
+    Standard landing-page structure. Hardcoded hex values. Heavy glow effects and neon gradients. Reads like an enthusiastic junior designer.
+  </Card>
+  <Card title="With the skill" icon="check">
+    Editorial magazine-style layout with grid compositions. oklch-based token system. Restrained palette, typographic hierarchy, decorative data elements. Reads like an experienced design director.
+  </Card>
+</Columns>
+
+The Photographer Portfolio demo illustrates this further: the skill created a fictional Nordic photographer "Mira Høst" with a complete visual identity — paper-warm light (`#f2efe8`) and ink-dark (`#161513`) in an extremely restrained two-tone palette, `mix-blend-mode: difference` navigation that renders seamlessly across light and dark sections, and a slow Ken Burns hero image on a 24-second cycle.
+
+### Layout philosophy
+
+- **Asymmetric grids** — avoid the predictable centered-column, push content to edges, use grid spans to create visual rhythm
+- **Bold type-size contrast** — a 4–6× ratio between `h1` and body text is normal; the heading carries the visual weight
+- **Whitespace as design** — when a page looks empty, that is a layout problem solved with composition, not a content problem solved by stuffing things in
+- **Numbered sections, side rails** — magazine conventions that give long-form pages a sense of editorial structure
+
+## HTML structure
+
+Every web page follows this base template:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descriptive Title</title>
+    <style>/* CSS */</style>
+</head>
+<body>
+    <!-- Content -->
+    <script>/* JS */</script>
+</body>
+</html>
+```
+
+<Note>
+Scripts go at the bottom of `<body>`, not in `<head>`. CSS lives in a `<style>` block in `<head>`. This order is intentional and part of the file structure specification.
+</Note>
+
+## CSS best practices enforced by the skill
+
+The skill mandates a specific set of CSS techniques that work together to produce robust, maintainable, and visually consistent pages.
+
+### Layout
+
+CSS Grid and Flexbox are the only layout primitives used. Float-based or table-based layouts are not produced.
+
+```css
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(1rem, 3vw, 2rem);
+}
+```
+
+### Design tokens via CSS custom properties
+
+Colors, spacing, radius, and typography scales are declared as custom properties before any component-level rules. This enforces consistency and makes the system easy to modify.
+
+```css
+:root {
+  --primary: oklch(0.55 0.25 250);
+  --primary-light: oklch(0.75 0.15 250);
+  --primary-dark: oklch(0.35 0.2 250);
+  --gray-50: oklch(0.98 0.002 250);
+  --gray-900: oklch(0.21 0.014 250);
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+}
+```
+
+### Fluid typography with `clamp()`
+
+Type sizes scale smoothly between viewport sizes without breakpoint jumps:
+
+```css
+h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  text-wrap: pretty;
+}
+
+body {
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  line-height: 1.6;
+}
+```
+
+### Component-level responsiveness with `@container`
+
+Rather than relying solely on viewport breakpoints, the skill uses container queries so components respond to their own available space:
+
+```css
+.card-container {
+  container-type: inline-size;
+}
+
+@container (min-width: 400px) {
+  .card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+  }
+}
+```
+
+### Dark and reduced-motion mode
+
+Every page respects system preferences for color scheme and motion:
+
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(0.10 0.01 250);
+    --text: oklch(0.95 0.005 250);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+## Advanced CSS effects
+
+For pages that call for distinctive visual moments, the skill uses native CSS capabilities that most AI-generated pages never touch:
+
+<AccordionGroup>
+  <Accordion title="SVG filters for texture and depth">
+    SVG `<filter>` elements applied via CSS produce effects — grain, blur, displacement — that GPU-accelerate cleanly and require no image assets.
+
+    ```css
+    .hero {
+      filter: url(#grain);
+    }
+    ```
+  </Accordion>
+  <Accordion title="backdrop-filter for layered UI">
+    Frosted-glass panels, blurred backgrounds beneath overlays, and depth-layered navigation bars:
+
+    ```css
+    .nav {
+      backdrop-filter: blur(12px) saturate(180%);
+      background: oklch(0.98 0.002 250 / 0.7);
+    }
+    ```
+  </Accordion>
+  <Accordion title="mix-blend-mode for seamless overlays">
+    The Photographer Portfolio demo uses `mix-blend-mode: difference` on the navigation masthead so it remains visible and legible across both light and dark page sections without JavaScript:
+
+    ```css
+    .masthead {
+      mix-blend-mode: difference;
+      color: white;
+    }
+    ```
+  </Accordion>
+  <Accordion title="mask for reveal effects and shape clipping">
+    CSS `mask` and `mask-image` create non-rectangular crops, gradient fades, and reveal animations without SVG clip paths:
+
+    ```css
+    .image-fade {
+      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Content principles
+
+<Warning>
+The skill enforces "less is more" strictly. Adding sections or pages without the user's direction is not permitted — they know their audience better. When a page looks sparse, the answer is composition and type-scale rhythm, not more content.
+</Warning>
+
+- **No filler content** — every element must earn its place
+- **Placeholders over fabricated data** — `[icon]`, `[16:9 image]`, initial-letter avatars instead of invented content
+- **No fake stats or logo walls** — fabricated numbers and testimonials damage credibility
+- **Don't stuff to fill** — if the page looks empty, solve it with whitespace and proportion, not extra sections
+
+## Example prompt
+
+```text
+Build a homepage for an independent photographer's portfolio. Deep focus on
+typography and whitespace. Minimal color — two tones at most. Hero image with
+subtle Ken Burns motion. Magazine-editorial section structure.
+```
+
+The skill will declare a design system (color, type, spacing, motion) before writing a single line of code, produce a v0 draft with placeholders for user review, then build the full page after direction is confirmed.
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Anti-AI clichés" icon="ban" href="/principles/anti-ai-cliches">
+    The explicit blocklist of patterns the skill avoids — gradients, emoji abuse, left-border cards, overused fonts.
+  </Card>
+  <Card title="oklch color system" icon="palette" href="/principles/oklch-color-system">
+    How the skill derives harmonious color palettes in perceptually uniform oklch space.
+  </Card>
+  <Card title="Typography and fonts" icon="type" href="/principles/typography-and-fonts">
+    Font selection rules, curated pairings, and the fonts the skill explicitly avoids.
+  </Card>
+  <Card title="Space Museum example" icon="rocket" href="/examples/space-museum">
+    Side-by-side comparison of the same prompt with and without the skill applied.
+  </Card>
+</Columns>

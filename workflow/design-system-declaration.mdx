@@ -1,0 +1,237 @@
+---
+title: "Design system declaration before writing code"
+description: "Before writing HTML, Web Design Skill outputs a design declaration covering palette, typography, spacing, and motion for your approval before code is written."
+---
+
+The design system declaration is a mandatory step that happens before any code is written. It forces an explicit, reviewable statement of every major design decision — color palette, typography, spacing, border radius, shadow hierarchy, and motion style — in plain Markdown. The user reviews and approves it, or redirects it, before implementation begins.
+
+## Why declare before coding
+
+Catching a direction mismatch in a paragraph of Markdown is cheap. Catching it after a full CSS token system, a set of components, and a layout have been built is expensive.
+
+The declaration step separates two distinct types of feedback:
+
+- **Direction feedback** — "I wanted warmer tones, not cool blue-violet" or "the font feels too editorial for a developer tool"
+- **Implementation feedback** — "this button radius is too large" or "the hover state needs more contrast"
+
+Direction feedback is only useful before code exists. Once a design system is implemented, redirecting it requires rewriting everything. The declaration step surfaces direction feedback at the only moment when acting on it is free.
+
+<Tip>
+If the user has provided a codebase, extract tokens directly from the source CSS rather than inventing them. Real tokens from the product's `tokens.css` or custom property declarations are always more accurate than guesses from screenshots.
+</Tip>
+
+## The design declaration format
+
+Before writing the first line of code, output a design declaration in this exact format:
+
+```markdown
+Design Decisions:
+- Color palette: [primary / secondary / neutral / accent]
+- Typography: [heading font / body font / code font]
+- Spacing system: [base unit and multiples]
+- Border-radius strategy: [large / small / sharp]
+- Shadow hierarchy: [elevation 1–5]
+- Motion style: [easing curves / duration / trigger]
+```
+
+Each field maps directly to a CSS custom property group in the final implementation. A user who reads the declaration can immediately tell whether the visual direction matches their intent.
+
+## What each field means
+
+<AccordionGroup>
+  <Accordion title="Color palette">
+    Declare the full color system, not just the primary brand color. A complete palette names at minimum:
+
+    - **Primary** — the dominant action and brand color (buttons, links, key highlights)
+    - **Secondary** — a supporting color used for secondary actions or complementary accents
+    - **Neutral** — the background, surface, and text spectrum (usually a warm or cool gray scale)
+    - **Accent** — a high-contrast pop color used sparingly for emphasis
+
+    All colors must come from a coherent system — derived via oklch from the brand hue, extracted from the provided design system, or selected from a validated pairing. No rogue hues added during implementation.
+
+    Example: `Color palette: Blue-violet primary (oklch 0.55 0.18 270) / soft indigo secondary / warm gray neutrals / amber accent`
+  </Accordion>
+
+  <Accordion title="Typography">
+    Declare all three type roles:
+
+    - **Heading font** — used for display text, section titles, and primary hierarchy. Choose a typeface with strong personality; avoid Inter, Roboto, Arial, Fraunces, and system-ui.
+    - **Body font** — used for paragraph text, labels, and UI copy. Should be highly readable at 16–18px.
+    - **Code font** — used for inline code, code blocks, and terminal output.
+
+    Example: `Typography: Space Grotesk (headings) / Plus Jakarta Sans (body) / JetBrains Mono (code)`
+  </Accordion>
+
+  <Accordion title="Spacing system">
+    Declare the base unit and the multiples used throughout the layout. An 8px base unit is the most common convention; the multiples define the rhythm.
+
+    Example: `Spacing system: 8px base — used as 8 / 16 / 24 / 32 / 48 / 64 / 96 / 128px`
+
+    This maps directly to CSS custom properties:
+
+    ```css
+    --s-1: 8px;
+    --s-2: 16px;
+    --s-3: 24px;
+    --s-4: 32px;
+    --s-5: 48px;
+    --s-6: 64px;
+    --s-7: 96px;
+    --s-8: 128px;
+    ```
+  </Accordion>
+
+  <Accordion title="Border-radius strategy">
+    Declare the overall approach to corner rounding. Options are:
+
+    - **Large** — prominent rounding (12–20px+), conveys friendliness and consumer warmth
+    - **Small** — subtle rounding (2–6px), conveys precision and professionalism
+    - **Sharp** — no rounding (0px), conveys editorial, technical, or industrial character
+
+    A strategy can also be hierarchical: sharp for containers, small rounding for interactive elements, pill radius for badges and tags.
+
+    Example: `Border-radius: Sharp (0) for layout containers / 4px for cards and inputs / pill (999px) for tags`
+  </Accordion>
+
+  <Accordion title="Shadow hierarchy">
+    Declare the elevation system — how many levels of shadow exist and what each conveys. A five-level system covers most products:
+
+    - **Elevation 1** — resting state (cards, panels); very subtle
+    - **Elevation 2** — hover state; slightly more lifted
+    - **Elevation 3** — dropdowns, popovers; clearly raised
+    - **Elevation 4** — modals, dialogs; strongly elevated
+    - **Elevation 5** — tooltips, floating elements; maximum elevation
+
+    Example: `Shadow hierarchy: No shadows (flat design); border-based separation only`
+
+    Or: `Shadow hierarchy: oklch-derived warm shadows at 5 elevations (4px / 8px / 16px / 24px / 40px blur)`
+  </Accordion>
+
+  <Accordion title="Motion style">
+    Declare the motion language before implementing any transitions or animations. Three sub-fields:
+
+    - **Easing curves** — the acceleration profile for enter, exit, and emphasized transitions
+    - **Duration** — the time budget for micro, base, hero, and epic animations
+    - **Trigger** — what events initiate motion (hover, focus, scroll, load, state change)
+
+    Example: `Motion style: Enter cubic-bezier(.2,.8,.2,1) 480ms / Exit cubic-bezier(.4,0,1,1) 200ms / Emphasized cubic-bezier(.6,-.05,.2,1.2) for focus states`
+
+    Restraint is a feature — not every interaction needs motion. Declare only what will be used.
+  </Accordion>
+</AccordionGroup>
+
+## How to review and respond
+
+When the AI outputs a design declaration, read it as a creative brief, not a technical spec. The questions to ask:
+
+- Does the color palette match the brand or intended mood?
+- Do the font choices suit the product category and audience?
+- Does the spacing feel right for the content density you expect?
+- Does the motion style match the pace and personality of the product?
+
+**To approve:** Reply with "looks good" or "proceed" — the AI will move to the v0 draft.
+
+**To redirect:** Describe what feels wrong in plain language. You do not need to know CSS custom property names or oklch values. "I want something warmer and less corporate" or "the fonts feel too editorial — I need something more tool-like" is enough.
+
+<Note>
+You can also provide partial approval: "the color palette and typography are right, but change the border-radius to sharp and the motion to more subtle." The AI will update the declaration before proceeding.
+</Note>
+
+## The CSS custom properties pattern
+
+The tokens declared in the design declaration map directly to CSS custom properties in the final output. The project's own `tokens.css` demonstrates the pattern:
+
+```css
+:root {
+  /* Color — oklch-derived, no rogue hues */
+  --paper:        oklch(0.965 0.018 78);
+  --paper-deep:   oklch(0.928 0.024 78);
+  --ink:          oklch(0.180 0.014 60);
+  --ink-soft:     oklch(0.300 0.014 60);
+  --ember:        oklch(0.700 0.170 42);
+
+  /* Spacing — 8px base */
+  --s-1: 8px;
+  --s-2: 16px;
+  --s-3: 24px;
+  --s-4: 32px;
+  --s-5: 48px;
+  --s-6: 64px;
+  --s-7: 96px;
+  --s-8: 128px;
+
+  /* Typography */
+  --f-serif: "Instrument Serif", Georgia, serif;
+  --f-sans:  "Geist", system-ui, sans-serif;
+  --f-mono:  "Geist Mono", "JetBrains Mono", monospace;
+
+  /* Border radius */
+  --r-0:    0px;
+  --r-1:    2px;
+  --r-2:    4px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --ease-enter:      cubic-bezier(.2, .8, .2, 1);
+  --ease-exit:       cubic-bezier(.4, 0, 1, 1);
+  --ease-emphasized: cubic-bezier(.6, -0.05, .2, 1.2);
+  --d-micro: 200ms;
+  --d-base:  480ms;
+  --d-hero:  900ms;
+}
+```
+
+Every color in the final output traces back to this declared system. No hue is introduced that was not named in the declaration step.
+
+## Complete example: SaaS dashboard declaration
+
+Here is a complete design declaration for a SaaS analytics dashboard:
+
+```markdown
+Design Decisions:
+- Color palette: Teal-blue primary oklch(0.55 0.14 210) / indigo secondary oklch(0.48 0.16 260) /
+  cool gray neutrals (paper oklch 0.97 0.005 220 → ink oklch 0.14 0.010 240) /
+  amber accent oklch(0.75 0.16 80) for positive metrics
+- Typography: Outfit (headings, weight 600–700) / Space Grotesk (body, labels, weight 400–500) /
+  JetBrains Mono (code, query strings, numeric data)
+- Spacing system: 8px base — 8 / 16 / 24 / 32 / 48 / 64 / 96px
+- Border-radius strategy: 6px for cards and inputs / 4px for buttons / 2px for table rows /
+  pill (999px) for status badges
+- Shadow hierarchy: Flat — no box-shadow; 1px border separates elevation levels;
+  focused elements use a 0 0 0 3px ring in primary-20% opacity
+- Motion style: Enter cubic-bezier(.2,.8,.2,1) 300ms / Exit cubic-bezier(.4,0,1,1) 150ms /
+  Triggered by hover and focus; no scroll-triggered animations
+```
+
+This declaration is complete enough for the user to validate direction before any code is written, and specific enough for the AI to derive a coherent CSS custom property system from it.
+
+## Color system integrity
+
+Every color in the final output must come from the declared system. This is enforced in the [pre-delivery checklist](/workflow/verification-checklist) as a hard requirement.
+
+In practice this means:
+- No hardcoded hex values that were not declared
+- No "one-off" colors added for a specific component
+- Variants and states are derived from declared tokens (e.g., primary at 80% opacity, not a new color)
+- Dark mode uses the same hues at adjusted lightness values, not new palettes
+
+<Warning>
+If you find yourself reaching for a color that is not in the declared system, stop. Either the declaration needs to be extended (and approved) or the design problem should be solved using the existing token set through opacity, lightness adjustment, or a different token.
+</Warning>
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Workflow overview" icon="list-ordered" href="/workflow/overview">
+    See where the design declaration fits in the full six-step workflow.
+  </Card>
+  <Card title="oklch color system" icon="droplet" href="/principles/oklch-color-system">
+    How perceptually uniform color derivation works and why it replaces hex guessing.
+  </Card>
+  <Card title="Typography and fonts" icon="type" href="/principles/typography-and-fonts">
+    Curated font pairings and the rules for avoiding overused AI defaults.
+  </Card>
+  <Card title="v0 draft strategy" icon="eye" href="/workflow/v0-draft-strategy">
+    What happens after the design declaration is approved.
+  </Card>
+</Columns>

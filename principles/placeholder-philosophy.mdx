@@ -1,0 +1,212 @@
+---
+title: "Placeholder philosophy: honest gaps over fake assets"
+description: "Web Design Skill uses placeholder markers for missing icons, images, and data to signal what real assets are needed — never faking them with emoji or drawn SVG."
+---
+
+When an AI model encounters a missing asset — an icon it can't draw well, an image that hasn't been provided, a statistic that hasn't been shared — it faces a choice: fake it or flag it. Web Design Skill takes a clear position: **a placeholder is more professional than a poorly drawn fake.** This principle shapes how every missing element in a design is handled, from icons to data to logos.
+
+## Why fakes are worse than placeholders
+
+The instinct to fill gaps is understandable. An empty slot in a design looks unfinished. Reaching for an emoji, a rough SVG sketch, or an invented number seems to solve the problem.
+
+It doesn't. It creates a worse one.
+
+<Warning>
+Fabricated content — invented statistics, fake customer logos, dummy testimonials, emoji-as-icons — damages credibility. Stakeholders who notice the fabrication lose trust in the entire artifact, and in the person who presented it.
+</Warning>
+
+A fake communicates: *"I knew this was missing and filled it with something that looks real."*
+
+A placeholder communicates: *"This slot requires a real asset. Here is exactly what kind."*
+
+The second message is honest and actionable. It tells stakeholders what they need to provide. It treats the design as a working document in progress, not a finished product with fake content.
+
+This distinction matters even more in prototypes and v0 drafts, where the design is explicitly not final. Using placeholders correctly signals design maturity: you know what you have, you know what you're missing, and you've made deliberate choices about each.
+
+## The placeholder conventions
+
+These are the standard approaches used throughout the skill for each type of missing asset:
+
+<AccordionGroup>
+  <Accordion title="Missing icon → square with label">
+    When an icon is needed but no icon library is available, use a square shape with a descriptive text label inside.
+
+    ```html
+    <!-- Simple square placeholder -->
+    <div class="icon-placeholder" aria-label="[icon: settings]">▢</div>
+
+    <!-- Or a labeled box -->
+    <div class="icon-placeholder">[icon]</div>
+    ```
+
+    The label should describe the intended icon if known: `[icon: settings]`, `[icon: arrow-right]`, `[icon: user]`. This gives handoff recipients exactly the information they need to replace it with the correct icon from the real library.
+
+    **Do not use emoji.** A settings gear emoji (`⚙️`) renders differently across platforms, carries messaging-app connotations, and has inconsistent sizing. A `[icon: settings]` placeholder is unambiguous and looks intentional.
+  </Accordion>
+
+  <Accordion title="Missing avatar → initial-letter circle">
+    For user avatars with no image available, render a circle with the user's initial letter and a consistent color fill derived from the name or a design token.
+
+    ```css
+    .avatar-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: oklch(0.70 0.15 250);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    ```
+
+    ```html
+    <div class="avatar-placeholder" aria-label="Avatar for Alex Chen">A</div>
+    ```
+
+    This approach is used in production by many applications (Google, GitHub) and looks finished rather than placeholder-like. It is the correct solution for missing avatars, not a temporary workaround.
+  </Accordion>
+
+  <Accordion title="Missing image → aspect-ratio card with description">
+    For images that haven't been provided, render a card at the correct aspect ratio with a description of what the image should contain.
+
+    ```html
+    <div class="image-placeholder" style="aspect-ratio: 16/9;">
+      16:9 image — product screenshot
+    </div>
+    ```
+
+    ```css
+    .image-placeholder {
+      background: oklch(0.92 0.006 250);
+      border: 1px dashed oklch(0.71 0.01 250);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: oklch(0.55 0.014 250);
+      font-size: 14px;
+    }
+    ```
+
+    Always include the aspect ratio and a description of the intended content. This makes the placeholder useful as a spec: when the real image arrives, the recipient knows exactly where it goes and what it should show.
+  </Accordion>
+
+  <Accordion title="Missing data → ask the user">
+    When a design calls for specific data — statistics, metrics, pricing, case study results — and none has been provided, **ask the user**. Do not fabricate.
+
+    This is the most important rule. Invented numbers look plausible until someone checks them. The moment a stakeholder discovers that "10,000+ customers" was made up, the entire design loses credibility.
+
+    The correct behavior is to use a clearly labeled placeholder:
+
+    ```
+    [Customer count — please provide]
+    [Uptime metric — please provide]
+    [Star rating — please provide]
+    ```
+
+    Or to omit the section entirely and note that it requires real data before it can be completed.
+  </Accordion>
+
+  <Accordion title="Missing logo → text name with geometric shape">
+    For brand logos that haven't been supplied, render the brand name in text alongside a simple geometric shape that stands in for the mark.
+
+    ```html
+    <div class="logo-placeholder">
+      <div class="logo-mark">▲</div>
+      <span class="logo-name">Acme Corp</span>
+    </div>
+    ```
+
+    This is far more professional than attempting to draw a logo in SVG. An SVG sketch looks amateurish and will be replaced anyway. The text-plus-shape approach is clean, legible, and signals exactly what is needed.
+
+    For partner logo walls (a common pattern in landing pages), use a row of styled text names in a consistent treatment rather than fabricating logos:
+
+    ```html
+    <div class="logo-wall">
+      <span>[Partner Logo]</span>
+      <span>[Partner Logo]</span>
+      <span>[Partner Logo]</span>
+    </div>
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## The emoji ban
+
+Emoji are explicitly banned as icon substitutes in the skill. This rule comes up frequently because the temptation is strong: emoji are universally available, require no library, and superficially resemble icons.
+
+The problems with emoji as icons:
+
+- **Platform inconsistency** — the same emoji renders differently on macOS, Windows, Android, and iOS. A design that uses emoji will look different on every device.
+- **Wrong connotations** — emoji carry associations from messaging contexts. A 🚀 in a dashboard sidebar reads as casual in a way that undermines professional interfaces.
+- **Size and alignment** — emoji don't scale predictably and are difficult to align precisely with text.
+- **Accessibility** — screen readers announce emoji by their name, which often produces awkward or misleading announcements when used out of context.
+
+The placeholder is always the better choice. `[icon: launch]` is unambiguous, looks intentional, and gives the designer or developer exactly the specification they need.
+
+<Note>
+The exception: if the brand itself uses emoji — as Notion does, as some consumer apps do — then follow the brand. The rule is about intentionality, not prohibition.
+</Note>
+
+## "Data slop" — the problem with invented metrics
+
+"Data slop" refers to designs filled with invented statistics, meaningless numbers, and icon-plus-label grids that create the appearance of data-driven credibility without communicating anything real.
+
+Common examples:
+
+```
+10,000+ happy customers    99.9% uptime    4.8/5 rating
+```
+
+```
+⚡ Fast    🔒 Secure    ✅ Reliable    🌍 Global
+```
+
+These patterns are immediately recognizable to experienced audiences. They signal that the designer didn't have real data and filled the gap with plausible-sounding numbers. This is worse than leaving the section empty — it actively damages trust.
+
+The correct approaches:
+
+1. **Use real data** provided by the user — actual customer counts, actual uptime figures, actual ratings
+2. **Use honest placeholders** — `[Customer count]`, `[Uptime SLA]`
+3. **Omit the section entirely** — if the section adds no real information, the design is stronger without it
+
+Empty whitespace handled well is always more professional than a section full of fabricated credibility signals.
+
+## Best practices for working with real assets
+
+When real assets are available, the placeholder conventions become specifications:
+
+<Steps>
+  <Step title="Replace placeholders before handoff">
+    Every `[icon]`, `[image]`, and `[logo]` placeholder should be replaced with a real asset before the design is delivered as final. Placeholders are working tools, not finished design elements.
+  </Step>
+  <Step title="Preserve the aspect ratio and sizing">
+    The placeholder's dimensions define the slot. Real assets should match — don't force a landscape image into a square slot, and don't shrink a logo to fit an oversized placeholder.
+  </Step>
+  <Step title="Use real data to validate the layout">
+    Real copy is almost always longer or shorter than placeholder text. When real content arrives, recheck the layout for overflow, truncation, and rhythm. The placeholder showed the structure; the real content reveals the edge cases.
+  </Step>
+  <Step title="Keep placeholder code clean">
+    Even in production builds, placeholder code should be clearly marked and easy to find. Use consistent class names (`icon-placeholder`, `image-placeholder`) and comments like `<!-- TODO: replace with real asset -->` so nothing accidentally ships as a placeholder.
+  </Step>
+</Steps>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Anti-AI clichés checklist" icon="ban" href="/principles/anti-ai-cliches">
+    The full blocklist including fabricated data, emoji abuse, and fake logo walls.
+  </Card>
+  <Card title="Workflow: v0 draft strategy" icon="layers" href="/workflow/v0-draft-strategy">
+    How placeholders are used in the v0 draft to communicate structure before content exists.
+  </Card>
+  <Card title="Verification checklist" icon="circle-check" href="/workflow/verification-checklist">
+    Pre-delivery checks including confirmation that no fabricated data has been included.
+  </Card>
+  <Card title="How it works" icon="gear" href="/how-it-works">
+    Overview of the six-step workflow that defines when and how placeholders are used.
+  </Card>
+</CardGroup>

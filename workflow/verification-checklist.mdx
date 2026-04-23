@@ -1,0 +1,240 @@
+---
+title: "Pre-delivery verification checklist"
+description: "Web Design Skill's pre-delivery checklist verifies no console errors, correct responsive rendering, full interaction states, and Dribbble-level visual quality."
+---
+
+The verification step is the final gate before any artifact is considered delivered. It is not a courtesy review — every item on the checklist must pass. The checklist exists because implementation moves fast and regressions are easy to introduce: a color added in one component can violate the declared design system, a React component can introduce a naming conflict, or a scrollIntoView call can break iframe-embedded previews.
+
+Walking through the checklist item by item before delivery catches these issues systematically, rather than discovering them through user feedback after the fact.
+
+## Why a checklist matters
+
+Design quality is not just visual — it is structural, behavioral, and semantic. A page that looks correct in one viewport but breaks at another, or a component that has a hover state but no focus state, is incomplete regardless of how polished the visual design is.
+
+The checklist enforces standards across three dimensions:
+
+- **Technical correctness** — no errors, correct rendering, complete interaction states
+- **Design system integrity** — all colors and fonts from the declared system, no rogue hues or banned typefaces
+- **Visual quality** — meets a Dribbble / Behance showcase standard, not just "functional"
+
+<Tip>
+Run the checklist in order. The items are roughly sequenced from most-breaking to least-visible — a console error in production is more urgent than a missing text-wrap property, though both must be fixed.
+</Tip>
+
+## The full pre-delivery checklist
+
+<AccordionGroup>
+  <Accordion title="No browser console errors or warnings">
+    Open the browser developer console and verify it is clean before delivery. This includes:
+
+    - JavaScript runtime errors
+    - React key warnings, prop-type mismatches, and hook violations
+    - Failed network requests (404s for CDN resources, missing fonts)
+    - Deprecation warnings
+
+    A console warning is not acceptable. Warnings become errors; errors become user-facing failures.
+  </Accordion>
+
+  <Accordion title="Correct rendering on target viewports">
+    Verify rendering at every relevant viewport:
+
+    - **Responsive web pages** — mobile (375px), tablet (768px), desktop (1280px+)
+    - **Mobile prototypes** — the target device dimensions (iPhone 14: 390×844, etc.)
+    - **Slide decks and fixed-dimension artifacts** — the scaling container must adapt without distortion; letterbox bars should appear rather than content being cut off
+
+    Do not assume desktop rendering implies correct mobile rendering. Layout bugs almost always appear at breakpoints, not at the design dimensions.
+  </Accordion>
+
+  <Accordion title="All interaction states present">
+    Every interactive component must have states for every applicable condition:
+
+    - **Hover** — visual feedback that the element is interactive
+    - **Focus** — keyboard navigation must be visually obvious (not just the browser default outline)
+    - **Active** — pressed / triggered state
+    - **Disabled** — reduced opacity or muted color; no pointer events
+    - **Loading** — skeleton, spinner, or progress indicator; never a blank state
+    - **Empty** — a state for when there is no data to show; never a broken layout
+    - **Error** — a state for when something fails; informative, not just red
+
+    Not every component needs every state — a static card does not need a loading state. Apply states based on what the component actually does in use.
+  </Accordion>
+
+  <Accordion title="No text overflow or truncation; text-wrap: pretty applied">
+    Verify that no text element overflows its container or is truncated unexpectedly. Long strings in labels, headings, and dynamic content are the most common sources of overflow bugs.
+
+    Apply `text-wrap: pretty` to paragraph and multi-line text elements for better line-break behavior:
+
+    ```css
+    p, li, blockquote {
+      text-wrap: pretty;
+    }
+    ```
+
+    `text-wrap: pretty` avoids orphaned single words on final lines — a detail that separates polished typography from default browser rendering.
+  </Accordion>
+
+  <Accordion title="All colors from the declared design system">
+    Every color value in the final output must trace back to a token declared in the Step 3 design declaration. This is not optional.
+
+    Check for:
+    - Hardcoded hex values not present in the token system
+    - Colors introduced for a single component that were not in the declaration
+    - State colors (hover, focus, error) derived from new hues rather than declared tokens at modified opacity or lightness
+
+    The rule: if you need a color that is not in the declared system, either extend the system (with user awareness) or solve the design problem using existing tokens.
+  </Accordion>
+
+  <Accordion title="No scrollIntoView">
+    Do not use `scrollIntoView` in any script. In iframe-embedded preview environments — which is how most AI-generated artifacts are displayed — `scrollIntoView` disrupts outer-frame scrolling and creates unpredictable behavior.
+
+    For programmatic scrolling, use alternatives:
+
+    ```javascript
+    // Instead of element.scrollIntoView()
+    element.scrollTop = targetPosition;
+
+    // Or for window-level scrolling
+    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    ```
+  </Accordion>
+
+  <Accordion title="React: no const styles = {}; cross-file exports via window">
+    React projects using inline Babel have two hard requirements that are easy to overlook:
+
+    **1. Never use `const styles = { ... }` as a variable name.**
+
+    Multiple component files compiled by Babel each run in separate scope, but they share the global `window` object. A `styles` variable in one component silently overwrites `styles` in another, causing bizarre visual bugs that are extremely difficult to debug.
+
+    Always namespace style objects with the component name:
+
+    ```jsx
+    // Wrong — will silently collide with other components
+    const styles = { container: { padding: 16 } };
+
+    // Correct — namespace prevents collisions
+    const dashboardStyles = { container: { padding: 16 } };
+    const sidebarStyles = { container: { padding: 8 } };
+    ```
+
+    Or use inline `style={{...}}` directly to avoid the issue entirely.
+
+    **2. Cross-file components must be exported via `Object.assign(window, {})`.**
+
+    Separate `<script type="text/babel">` blocks do not share module scope — each is compiled independently. To make a component defined in one script available in another, explicitly attach it to `window`:
+
+    ```jsx
+    function Sidebar() { /* ... */ }
+    function Header() { /* ... */ }
+
+    // At the end of the file — makes these available to other scripts
+    Object.assign(window, { Sidebar, Header });
+    ```
+
+    Without this, components appear undefined when referenced across script boundaries.
+  </Accordion>
+
+  <Accordion title="No AI clichés">
+    Verify the output does not exhibit the telltale patterns of generic AI-generated design:
+
+    - **Purple-pink-blue gradient backgrounds** — the most common AI visual signature
+    - **Left-border accent cards** — a card style that has been overused to the point of meaninglessness
+    - **Emoji as icon substitutes** — 🚀 ⚡ ✨ as decorative filler or icon replacements
+    - **Inter / Roboto / Arial / Fraunces / system-ui** — these font choices mark the output as AI-default, not intentionally designed
+    - **Meaningless stats** — large numbers displayed without data integrity ("10M+ users", "99.9% uptime" with no basis)
+    - **Fabricated social proof** — fake customer logo walls, invented testimonial counts, made-up review scores
+
+    These patterns are not just aesthetic concerns — they actively signal to the viewer that the design was not made intentionally.
+  </Accordion>
+
+  <Accordion title="No filler content, no fabricated data">
+    Every element in the output must earn its place. Verify:
+
+    - No placeholder copy that was not replaced with real or intentional content
+    - No fabricated data presented as real (fake chart numbers, invented metrics)
+    - No sections added speculatively that the user did not request
+    - No "lorem ipsum" or equivalent filler text
+
+    If real content was not provided, use explicit placeholders (`[headline copy]`, `[metric: ask client]`) — never invent content that could mislead.
+  </Accordion>
+
+  <Accordion title="Semantic naming, clean structure, easy to modify">
+    The artifact should be structured so that a developer picking it up can understand and modify it without reverse-engineering intent:
+
+    - CSS custom properties named semantically (`--color-primary`, not `--c1`)
+    - Component and function names that describe what they do
+    - No dead code, commented-out experiments, or debug logging
+    - Style objects namespaced (see React rules above)
+    - HTML element choices reflect document structure, not just visual appearance
+
+    Clean structure is a delivery requirement, not an optional nicety. If the artifact cannot be maintained, it has not fully delivered its value.
+  </Accordion>
+
+  <Accordion title="Visual quality at Dribbble / Behance showcase level">
+    The final visual quality bar is "stunning, not functional." Before delivery, ask: would this artifact stand on its own as a piece of design work worth showcasing?
+
+    Indicators of Dribbble-level quality:
+
+    - Deliberate typographic hierarchy with meaningful size ratios (4–6× between display and body text is normal)
+    - Intentional use of whitespace — not empty space, but composed space
+    - Color used with restraint and purpose — not every element needs color
+    - Micro-interactions that feel considered and appropriate, not arbitrary
+    - Visual rhythm that guides the eye through the content in the intended order
+
+    If the output looks like a default Bootstrap page or a first-draft wireframe with color applied, it has not met the quality bar.
+  </Accordion>
+</AccordionGroup>
+
+## React-specific hard rules
+
+Three rules apply to every React project without exception:
+
+<Columns cols={1}>
+  <Card title="Never use const styles = {}" icon="triangle-alert">
+    Multiple Babel-compiled scripts share the `window` scope. A `styles` object in one script silently overwrites `styles` in another. Always namespace: `const terminalStyles`, `const headerStyles`, `const dashboardStyles`. Or use inline `style={{...}}` to avoid the issue entirely.
+  </Card>
+</Columns>
+
+<Columns cols={1}>
+  <Card title="Export cross-file components via Object.assign(window, {})" icon="triangle-alert">
+    Separate `<script type="text/babel">` blocks do not share module scope. Components defined in one script are not automatically available in others. Export explicitly at the end of every component file: `Object.assign(window, { ComponentName })`.
+  </Card>
+</Columns>
+
+<Columns cols={1}>
+  <Card title="No scrollIntoView anywhere" icon="triangle-alert">
+    `scrollIntoView` disrupts outer-frame scrolling in iframe-embedded previews. Use `element.scrollTop = value` or `window.scrollTo({...})` for programmatic scrolling.
+  </Card>
+</Columns>
+
+## Checklist quick reference
+
+| Item | Category |
+|---|---|
+| No browser console errors or warnings | Technical |
+| Correct rendering on target viewports | Technical |
+| All interaction states present (hover / focus / active / disabled / loading / empty / error) | Technical |
+| No text overflow; `text-wrap: pretty` applied | Technical |
+| All colors from declared design system — no rogue hues | Design integrity |
+| No `scrollIntoView` | Technical (React/iframe) |
+| React: no `const styles = {}`; cross-file exports via `Object.assign(window, {})` | Technical (React) |
+| No AI clichés (gradients, emoji, left-border cards, Inter/Roboto) | Design integrity |
+| No filler content, no fabricated data | Content integrity |
+| Semantic naming, clean structure, easy to modify | Code quality |
+| Visual quality at Dribbble / Behance showcase level | Design quality |
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Workflow overview" icon="list-ordered" href="/workflow/overview">
+    See where verification fits in the full six-step workflow.
+  </Card>
+  <Card title="Anti-AI clichés" icon="ban" href="/principles/anti-ai-cliches">
+    The full list of overused AI design patterns banned by the skill.
+  </Card>
+  <Card title="Design system declaration" icon="palette" href="/workflow/design-system-declaration">
+    How the declared color system is established and why it must be honored.
+  </Card>
+  <Card title="Placeholder philosophy" icon="square-dashed" href="/principles/placeholder-philosophy">
+    Why placeholders are more professional than fabricated content or fake data.
+  </Card>
+</Columns>

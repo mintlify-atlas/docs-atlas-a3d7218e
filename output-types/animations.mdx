@@ -1,0 +1,271 @@
+---
+title: "CSS and JavaScript animations for web artifacts"
+description: "Web Design Skill uses four animation layers — CSS, React state, a timeline engine, and Popmotion — choosing the simplest approach for each motion requirement."
+---
+
+Animation in Web Design Skill is layered: the simplest tool that can express the motion is always chosen first. This prevents over-engineering micro-interactions with heavy libraries and avoids the performance and compatibility problems that come with large animation frameworks. Each layer adds capability at the cost of complexity — reach for the next layer only when the current one genuinely cannot cover the use case.
+
+## The four-layer animation approach
+
+<Steps>
+  <Step title="CSS transitions and animations">
+    The right choice for approximately 80% of motion: button presses, card hovers, fade-in entry animations, state toggles, loading spinners. No JavaScript required; the browser's compositor handles them efficiently.
+
+    ```css
+    .button {
+      transition: transform 120ms ease-out, box-shadow 120ms ease-out;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px oklch(0 0 0 / 0.15);
+    }
+    .button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card {
+      animation: fadeIn 300ms ease-out both;
+    }
+    ```
+  </Step>
+  <Step title="React state with setTimeout / requestAnimationFrame">
+    For event-driven animations that need JavaScript logic — progress bars, step-through sequences, animated counters, or any motion triggered by user interaction that CSS alone cannot express.
+
+    ```jsx
+    const [progress, setProgress] = React.useState(0);
+
+    React.useEffect(() => {
+      let frame;
+      const start = performance.now();
+      const duration = 800;
+
+      const tick = (now) => {
+        const elapsed = now - start;
+        const t = Math.min(elapsed / duration, 1);
+        setProgress(t);
+        if (t < 1) frame = requestAnimationFrame(tick);
+      };
+
+      frame = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(frame);
+    }, []);
+    ```
+  </Step>
+  <Step title="Custom `useTime` + `Easing` + `interpolate`">
+    For timeline-driven demo scenes: scrubber-controlled animations, multi-segment choreography, video-like sequences where multiple elements move in coordinated parallel tracks.
+
+    ```jsx
+    const useTime = (duration = 5000) => {
+      const [time, setTime] = React.useState(0);
+      const [playing, setPlaying] = React.useState(true);
+      const frameRef = React.useRef();
+      const startRef = React.useRef();
+
+      React.useEffect(() => {
+        if (!playing) return;
+        const animate = (timestamp) => {
+          if (!startRef.current) startRef.current = timestamp;
+          const elapsed = (timestamp - startRef.current) % duration;
+          setTime(elapsed / duration); // normalized 0 → 1
+          frameRef.current = requestAnimationFrame(animate);
+        };
+        frameRef.current = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(frameRef.current);
+      }, [playing, duration]);
+
+      return { time, playing, setPlaying };
+    };
+    ```
+  </Step>
+  <Step title="Popmotion (fallback only)">
+    If the above three layers genuinely cannot cover the use case — physics-based spring animations, gesture-driven motion, complex keyframe interpolation — use Popmotion as a fallback:
+
+    ```html
+    <script src="https://unpkg.com/popmotion@11.0.5/dist/popmotion.min.js"></script>
+    ```
+
+    This is the last resort, not the first choice.
+  </Step>
+</Steps>
+
+## Libraries to avoid
+
+<Warning>
+Do not use Framer Motion, GSAP, or Lottie unless the user explicitly requests them or the scenario genuinely requires them. These libraries introduce bundle-size overhead, version-compatibility issues, and problems with React 18's inline Babel mode that make them unreliable in the skill's delivery environment.
+</Warning>
+
+| Library | Issue |
+|---------|-------|
+| Framer Motion | Incompatible with React 18 UMD + Babel standalone CDN setup |
+| GSAP | Large bundle; proprietary license for some plugins |
+| Lottie | Requires pre-exported JSON from After Effects; cannot be hand-authored |
+
+## The easing library
+
+A unified easing-function library is defined at the project level and reused across all animated components. Using the same easing set produces a consistent motion language — elements feel like they belong to the same system.
+
+```javascript
+const Easing = {
+  linear:     t => t,
+  easeInOut:  t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+  easeOut:    t => 1 - Math.pow(1 - t, 3),
+  easeIn:     t => t * t * t,
+  spring:     t => 1 - Math.pow(Math.E, -6 * t) * Math.cos(8 * t)
+};
+```
+
+The `interpolate` function applies an easing to any numeric range:
+
+```javascript
+const interpolate = (t, from, to, easing = Easing.easeInOut) => {
+  const progress = easing(Math.max(0, Math.min(1, t)));
+  return from + (to - from) * progress;
+};
+
+// Usage:
+const { time } = useTime(3000);
+const opacity = interpolate(time, 0, 1);              // fade in
+const x       = interpolate(time, -100, 0, Easing.spring); // spring slide-in
+```
+
+## Required controls for animation artifacts
+
+Every animation or video-type artifact must include a play/pause button and a progress scrubber. These are non-negotiable — a looping animation with no controls gives the reviewer no ability to inspect specific moments.
+
+```jsx
+const AnimationControls = ({ playing, setPlaying, time, setTime, duration }) => (
+  <div style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '8px 16px',
+    background: 'rgba(0,0,0,0.8)',
+    borderRadius: 8
+  }}>
+    <button onClick={() => setPlaying(p => !p)}>
+      {playing ? 'Pause' : 'Play'}
+    </button>
+    <input
+      type="range"
+      min={0} max={1} step={0.001}
+      value={time}
+      onChange={e => setTime(Number(e.target.value))}
+      style={{ flex: 1 }}
+    />
+    <span style={{ color: '#fff', fontSize: 13, minWidth: 48 }}>
+      {Math.round(time * duration / 1000)}s
+    </span>
+  </div>
+);
+```
+
+## No title screen on animation artifacts
+
+Animation artifacts go straight into the main content. There is no splash screen, logo reveal, or title card between the user and the animation. The first frame is the first meaningful frame.
+
+This applies to:
+- Timeline-driven demo scenes
+- CSS animation showcases
+- Motion design explorations
+- Animated data visualizations
+
+## CSS animation best practices
+
+### Respect `prefers-reduced-motion`
+
+All CSS animations must be suppressed for users who have enabled the reduced-motion accessibility preference:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+### Use the compositor's fast path
+
+For smooth animations, keep transitions on properties that the browser can composite without triggering layout or paint: `transform`, `opacity`, `filter`. Avoid animating `width`, `height`, `top`, `left`, `margin`, or `padding` — these force layout recalculation every frame.
+
+```css
+/* Fast: compositor-only */
+.card { transition: transform 200ms ease-out, opacity 200ms ease-out; }
+
+/* Slow: triggers layout */
+.card { transition: width 200ms ease-out, height 200ms ease-out; }
+```
+
+### Easing curve selection
+
+| Motion type | Easing |
+|-------------|--------|
+| Elements entering the screen | `ease-out` — fast start, gentle finish |
+| Elements leaving the screen | `ease-in` — gentle start, fast finish |
+| State toggles | `ease-in-out` — symmetric, feels deliberate |
+| Physical/spring feel | Custom `cubic-bezier` or the `spring` easing above |
+
+```css
+/* Entry */
+.modal-enter { animation: slideUp 300ms cubic-bezier(0, 0, 0.2, 1) both; }
+
+/* Exit */
+.modal-exit { animation: slideDown 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+```
+
+## Timeline choreography example
+
+The `useTime` hook normalizes time to a 0–1 value over the configured duration. Multi-element choreography is expressed as segments of that range:
+
+```jsx
+function Scene() {
+  const { time, playing, setPlaying } = useTime(4000);
+
+  // Element 1: enters during first 30% of timeline
+  const titleOpacity = interpolate(
+    Math.min(time / 0.3, 1), 0, 1, Easing.easeOut
+  );
+
+  // Element 2: enters between 20% and 50%
+  const subtitleT = Math.max(0, (time - 0.2) / 0.3);
+  const subtitleY = interpolate(
+    Math.min(subtitleT, 1), 20, 0, Easing.spring
+  );
+
+  // Element 3: enters between 40% and 70%
+  const chartOpacity = interpolate(
+    Math.max(0, Math.min((time - 0.4) / 0.3, 1)), 0, 1, Easing.easeOut
+  );
+
+  return (
+    <div>
+      <h1 style={{ opacity: titleOpacity }}>Main Heading</h1>
+      <p style={{ transform: `translateY(${subtitleY}px)` }}>Subtitle</p>
+      <div style={{ opacity: chartOpacity }}>Chart content</div>
+    </div>
+  );
+}
+```
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Interactive prototypes" icon="mouse-pointer" href="/output-types/interactive-prototypes">
+    Adding animation to prototype screens — hover states, transitions, and loading sequences.
+  </Card>
+  <Card title="Advanced patterns reference" icon="code" href="/reference/advanced-patterns">
+    Full animation timeline engine implementation with `useTime`, `Easing`, and `interpolate`.
+  </Card>
+  <Card title="CDN resources" icon="globe" href="/reference/cdn-resources">
+    Pinned CDN URL for Popmotion and other animation-related libraries.
+  </Card>
+  <Card title="Slide decks" icon="presentation" href="/output-types/slide-decks">
+    Applying CSS transitions and entry animations to HTML presentation slides.
+  </Card>
+</Columns>

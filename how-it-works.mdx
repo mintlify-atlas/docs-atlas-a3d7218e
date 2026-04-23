@@ -1,0 +1,136 @@
+---
+title: "How Web Design Skill produces better output"
+description: "Web Design Skill enforces a six-step workflow, banning common AI clichés and requiring design system declarations before any code is written."
+---
+
+Web Design Skill works by injecting a structured system prompt — the `SKILL.md` file — directly into the agent's context before it processes your request. Instead of relying on the agent's default aesthetic instincts, the skill replaces them with an explicit set of design principles, a declared workflow, and a pre-delivery checklist that must be satisfied before output is considered complete.
+
+## How agents pick up the skill
+
+When you place `SKILL.md` in `.agents/skills/web-design-engineer/` (or `.claude/skills/web-design-engineer/`), SKILL.md-compatible agents read it as a structured skill definition. The file's frontmatter declares when the skill applies:
+
+```yaml
+name: web-design-engineer
+description: |
+  Build high-quality visual Web artifacts using HTML/CSS/JavaScript/React — web pages,
+  landing pages, dashboards, interactive prototypes, HTML slide decks, animated demos,
+  UI mockups, data visualizations, and more.
+  Use this skill whenever the user's request involves a visual, interactive, or
+  front-end deliverable...
+```
+
+The agent uses this description to recognize when a request falls within the skill's scope — any visual, interactive, or presentational front-end deliverable — and applies the full skill context for that request. No explicit invocation is required.
+
+<Note>
+The skill is **not applicable** to back-end APIs, CLI tools, data-processing scripts, performance tuning, or other tasks with no visual output. For those requests, the agent uses its default behavior.
+</Note>
+
+## The six-step workflow
+
+Every artifact produced under this skill follows the same six-step process. The workflow is designed to surface design decisions early, let you course-correct before significant work is done, and ensure no detail is left unchecked at delivery.
+
+<Steps>
+  <Step title="Understand requirements">
+    The agent assesses how much information has been provided and asks only what is genuinely missing. For a fully specified request (a PRD with audience, duration, and tone), it proceeds immediately. For a vague request ("make a deck"), it asks for audience, tone, constraints, and variant dimensions before starting.
+
+    The rule is: **never mechanically fire off a long list of questions every time.** The depth of questioning is proportional to the ambiguity of the request.
+  </Step>
+
+  <Step title="Gather design context">
+    Good design is rooted in existing context. The agent never starts from nothing. It works through a priority order:
+
+    1. Resources you provide proactively (screenshots, Figma files, codebases, design systems) — read thoroughly and extract tokens
+    2. Existing pages of your product — the agent may ask to review them
+    3. Industry best practices and reference brands — the agent asks which to use
+    4. Starting from scratch — the agent tells you explicitly that starting without reference affects final quality, and establishes a baseline from industry best practices
+
+    When you provide both a codebase and screenshots, the agent prioritizes reading source code and extracting design tokens — rebuilding from code yields far higher quality than guessing from screenshots.
+  </Step>
+
+  <Step title="Declare the design system">
+    Before writing the first line of code, the agent outputs a design system declaration in Markdown and waits for your confirmation. The declaration covers:
+
+    ```markdown
+    Design Decisions:
+    - Color palette: [primary / secondary / neutral / accent]
+    - Typography: [heading font / body font / code font]
+    - Spacing system: [base unit and multiples]
+    - Border-radius strategy: [large / small / sharp]
+    - Shadow hierarchy: [elevation 1–5]
+    - Motion style: [easing curves / duration / trigger]
+    ```
+
+    This step exists because changing a design system after the code is written is expensive. Changing it in a six-line Markdown block takes seconds.
+  </Step>
+
+  <Step title="Show a v0 draft early">
+    Before building full components, the agent produces a "viewable v0" — a lightweight first pass using placeholders, the declared design tokens, and key layout structure. The v0 deliberately omits content detail, complete component states, and motion.
+
+    The goal is to let you answer: Is the tone right? Is the layout direction right? Are the variant directions right? A v0 that prompts a correction is more valuable than a polished v1 built in the wrong direction.
+  </Step>
+
+  <Step title="Full build">
+    After the v0 is approved, the agent writes full components, adds interaction states, and implements motion. If an important decision point arises during the build — for example, a choice between two interaction approaches — the agent pauses and confirms rather than pushing through silently.
+
+    Technical standards applied at this stage include: CSS Grid + Flexbox for layout, CSS custom properties for all design tokens, oklch-based color derivation, `clamp()` for fluid typography, `@container` queries for component responsiveness, and pinned CDN versions for React and Babel.
+  </Step>
+
+  <Step title="Verify">
+    Before considering the work delivered, the agent walks through the pre-delivery checklist item by item. All items must pass:
+
+    - No browser console errors or warnings
+    - Correct rendering across target devices and viewports
+    - Interactive components cover all required states (hover, focus, active, disabled, loading, empty, error)
+    - No text overflow; `text-wrap: pretty` applied
+    - All colors sourced from the declared design system — no rogue hues
+    - No AI clichés (purple-pink gradients, emoji abuse, left-border accent cards, Inter/Roboto)
+    - No filler content, no fabricated data
+    - Visual quality at Dribbble/Behance showcase level
+  </Step>
+</Steps>
+
+## Anti-cliché enforcement
+
+The skill maintains an explicit blocklist of design patterns that are so common in AI-generated output that they immediately signal "assembled by AI." The agent actively avoids:
+
+- Gradient backgrounds, especially purple-pink-blue combinations
+- Rounded cards with a colored left-border accent
+- Cookie-cutter gradient buttons paired with large-radius cards
+- The fonts Inter, Roboto, Arial, Fraunces, and system-ui
+- Emoji used as icon substitutes or decorative filler
+- Meaningless stats, numbers, and icon spam ("data slop")
+- Fabricated customer logo walls or fake testimonial counts
+
+This is not a soft guideline — it appears in the pre-delivery verification checklist as a required pass condition.
+
+<Note>
+When no icon library is available, the agent uses explicit placeholders (`[icon]`, simple geometric shapes) rather than emoji. A placeholder signals "real material needed here." Emoji signals "I cut corners."
+</Note>
+
+## Design system declaration in depth
+
+The declaration step is the mechanism that separates this skill from a standard coding agent. By requiring the agent to articulate design choices in natural language before touching code, it creates a checkpoint where you can:
+
+- Redirect the color palette before it's baked into hundreds of CSS variables
+- Switch the font pairing before it determines all typographic hierarchy decisions
+- Adjust the motion style before it's implemented across every component
+- Confirm that the tone and visual direction match your intent
+
+This approach — declare first, code second — is the primary reason the skill produces consistent results across different prompts and domains.
+
+## v0 draft strategy in depth
+
+The v0 exists to answer one question cheaply: **is the direction right?**
+
+A full build with wrong direction must be mostly scrapped. A v0 with wrong direction costs a two-line correction. The v0 includes:
+
+- Core layout structure with key module positions
+- The declared color and typography tokens applied to structure
+- Explicit placeholder markers where real assets are needed (`[image]`, `[icon]`, `16:9 image`)
+- The agent's list of design assumptions so you can validate or override them
+
+The v0 deliberately excludes content detail, complete component library, all interaction states, and motion — those come only after the direction is confirmed.
+
+<Tip>
+When you receive a v0, treat it as a direction question, not a quality question. The right feedback is "yes, continue" or "adjust the tone / layout / palette." Save component-level feedback for the full build.
+</Tip>

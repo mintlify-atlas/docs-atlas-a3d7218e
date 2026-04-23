@@ -1,0 +1,300 @@
+---
+title: "HTML slide decks with auto-scaling"
+description: "Web Design Skill generates fixed-canvas 1920×1080 HTML presentations with JS auto-scaling, keyboard navigation, and localStorage position persistence."
+---
+
+HTML slide decks produced by Web Design Skill are self-contained single-file presentations. They run in any browser, require no presentation software, and auto-fit to any screen size via JavaScript scaling. The fixed 1920×1080 canvas gives full design control while the scaling engine handles the rest.
+
+## Fixed canvas with auto-scaling
+
+Every slide deck uses a fixed 1920×1080 (16:9) canvas — the `.stage` container — and a JavaScript scaling engine that calculates the correct `transform: scale()` value to fit it into any viewport. The stage is centered with letterbox bars on whichever axis has extra space.
+
+```html
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .stage {
+    width: 1920px;
+    height: 1080px;
+    position: relative;
+    transform-origin: center center;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 80px;
+  }
+  .slide.active { display: flex; }
+</style>
+```
+
+The scaling function runs on load and on every `resize` event:
+
+```javascript
+function scaleStage() {
+  const stage = document.querySelector('.stage');
+  const scaleX = window.innerWidth / 1920;
+  const scaleY = window.innerHeight / 1080;
+  const scale = Math.min(scaleX, scaleY);
+  stage.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', scaleStage);
+scaleStage();
+```
+
+## Keyboard navigation
+
+Three key bindings cover all navigation needs:
+
+| Key | Action |
+|-----|--------|
+| `→` | Next slide |
+| `←` | Previous slide |
+| `Space` | Next slide |
+
+```javascript
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') showSlide(current + 1);
+  if (e.key === 'ArrowLeft') showSlide(current - 1);
+});
+```
+
+## localStorage persistence
+
+The current slide index persists in `localStorage` so a browser refresh during iterative review does not lose position. This is a frequent action — presenters refresh the file after edits without wanting to re-navigate.
+
+```javascript
+let current = parseInt(localStorage.getItem('slideIndex') || '0');
+
+function showSlide(n) {
+  current = Math.max(0, Math.min(n, slides.length - 1));
+  slides.forEach((s, i) => s.classList.toggle('active', i === current));
+  localStorage.setItem('slideIndex', current);
+  document.querySelector('.slide-counter').textContent =
+    `${current + 1} / ${slides.length}`;
+}
+
+showSlide(current);
+```
+
+<Note>
+The internal array is 0-indexed for JavaScript convenience, but the slide counter displayed to the user is always 1-indexed. "Slide 5" in human speech maps to index `4` in code. The counter renders `current + 1`.
+</Note>
+
+## Slide numbering and labeling
+
+Slide numbers are 1-indexed in all human-facing labels. Each `<section class="slide">` element carries a `data-screen-label` attribute that matches the 1-indexed numbering:
+
+```html
+<section class="slide active" data-screen-label="01 Title">
+  <!-- Title slide content -->
+</section>
+
+<section class="slide" data-screen-label="02 Agenda">
+  <!-- Agenda slide content -->
+</section>
+
+<section class="slide" data-screen-label="03 Problem">
+  <!-- Problem framing content -->
+</section>
+```
+
+The label format is two-digit zero-padded number followed by a short descriptor. This matches how people refer to slides in conversation ("go back to slide 5") and avoids the off-by-one confusion that 0-indexed labels create.
+
+## Controls outside the scaled container
+
+Prev/next buttons are positioned **outside** the `.stage` element — as `position: fixed` elements — so they remain usable on small screens where the scaled stage might crowd out space.
+
+```html
+<div class="controls">
+  <button onclick="showSlide(current - 1)">←</button>
+  <button onclick="showSlide(current + 1)">→</button>
+</div>
+<div class="slide-counter"></div>
+```
+
+```css
+.controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 1000;
+}
+.controls button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+.slide-counter {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+}
+```
+
+## Complete responsive slide engine
+
+The full engine template combining all the above pieces:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Presentation Title</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+    }
+    .stage {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      transform-origin: center center;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 80px;
+    }
+    .slide.active { display: flex; }
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 1000;
+    }
+    .controls button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .slide-counter {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <section class="slide" data-screen-label="01 Title">
+      <!-- Slide 1 content -->
+    </section>
+    <section class="slide" data-screen-label="02 Content">
+      <!-- Slide 2 content -->
+    </section>
+  </div>
+
+  <div class="controls">
+    <button onclick="showSlide(current - 1)">←</button>
+    <button onclick="showSlide(current + 1)">→</button>
+  </div>
+  <div class="slide-counter"></div>
+
+  <script>
+    function scaleStage() {
+      const stage = document.querySelector('.stage');
+      const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      stage.style.transform = `scale(${scale})`;
+    }
+    window.addEventListener('resize', scaleStage);
+    scaleStage();
+
+    let current = parseInt(localStorage.getItem('slideIndex') || '0');
+    const slides = document.querySelectorAll('.slide');
+
+    function showSlide(n) {
+      current = Math.max(0, Math.min(n, slides.length - 1));
+      slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      localStorage.setItem('slideIndex', current);
+      document.querySelector('.slide-counter').textContent =
+        `${current + 1} / ${slides.length}`;
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === ' ') showSlide(current + 1);
+      if (e.key === 'ArrowLeft') showSlide(current - 1);
+    });
+
+    showSlide(current);
+  </script>
+</body>
+</html>
+```
+
+## Design constraints for slide content
+
+<Warning>
+Presentations should not be read from — they should be seen. Violating these constraints produces slides that look like formatted documents, not visual communication.
+</Warning>
+
+- **Text minimum 24px** — at 1920×1080 scale, smaller text is illegible from a normal viewing distance; 32–48px is typical for body text
+- **Touch targets minimum 44px** — for any interactive elements within a slide
+- **1–2 background colors per deck** — more colors fragment the visual system and dilute emphasis
+- **Visuals lead, text supports** — if a slide contains only bullet points, it is a layout problem; solve with diagrams, data, or strong typographic composition
+- **No text overflow** — apply `text-wrap: pretty` and `overflow: hidden` defensively; a cropped slide is a broken slide
+
+### Speaker notes
+
+When requested, speaker notes can be embedded as hidden `<aside>` elements within each slide and toggled with a keyboard shortcut (typically `N`):
+
+```html
+<section class="slide" data-screen-label="03 Key Point">
+  <!-- Visible slide content -->
+  <aside class="speaker-notes" hidden>
+    Notes visible only in presenter mode. Mention the Q3 results here.
+  </aside>
+</section>
+```
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Advanced patterns reference" icon="code" href="/reference/advanced-patterns">
+    The full slide engine template and other code patterns from the skill's reference library.
+  </Card>
+  <Card title="Typography and fonts" icon="type" href="/principles/typography-and-fonts">
+    Font selection for presentations — minimum sizes, pairing recommendations, and fonts to avoid.
+  </Card>
+  <Card title="Animations" icon="play" href="/output-types/animations">
+    Adding slide transitions and in-slide motion with CSS animations and the timeline engine.
+  </Card>
+  <Card title="Workflow overview" icon="git-branch" href="/workflow/overview">
+    The six-step process from requirements through v0 draft to final delivery.
+  </Card>
+</Columns>

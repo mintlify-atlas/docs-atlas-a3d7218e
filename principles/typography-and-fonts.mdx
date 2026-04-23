@@ -1,0 +1,171 @@
+---
+title: "Typography and font selection for AI-generated web pages"
+description: "Web Design Skill bans Inter and Roboto and offers six curated font pairings — Space Grotesk, Newsreader, Sora — to create intentional typographic hierarchy."
+---
+
+Typography is one of the most powerful signals of design quality — and one of the most commonly defaulted on by AI tools. When a model has no explicit font guidance, it gravitates toward the same handful of choices that dominate its training data. Web Design Skill addresses this directly with a banned fonts list, a curated set of validated pairings, and concrete rules for building typographic hierarchy that creates visual impact.
+
+## The banned fonts list
+
+Five fonts are explicitly prohibited as defaults:
+
+<Warning>
+Never use **Inter**, **Roboto**, **Arial**, **Fraunces**, or **system-ui** as default font choices. These fonts are so prevalent in AI-generated output that their presence alone signals a lack of design intentionality.
+</Warning>
+
+| Font | Why it's banned |
+|---|---|
+| **Inter** | The most common font in AI-generated interfaces. Its ubiquity means it carries no personality — it signals "default" rather than "designed." |
+| **Roboto** | Google's original Material Design font. Overused in both AI output and template-based design. Strongly associated with generic web applications. |
+| **Arial** | A legacy system fallback. Using Arial signals that no font decision was made — the browser just picked the nearest available option. |
+| **Fraunces** | Briefly popular in AI-generated editorial and marketing designs. Now strongly associated with "AI chose this because it looks editorial." |
+| **system-ui** | The font of no decision. It defers entirely to the operating system, producing different results on every platform and communicating nothing about brand personality. |
+
+<Note>
+These restrictions apply when no brand or design system has been specified. If the project already uses one of these fonts, follow the existing system — the goal is intentionality, not prohibition.
+</Note>
+
+## Type scale principles
+
+Strong typographic hierarchy depends on contrast, not just size increments. The skill calls for a **4–6× ratio between the largest heading and body text**:
+
+- Body text baseline: `16–18px` for web; `24px` minimum for presentations
+- `h1` at body × 4–6: typically `64–96px` for hero headings
+- Intermediate levels (`h2`, `h3`) should each represent a clearly perceptible step, not increments of 2–4px
+
+Fluid typography using `clamp()` lets a single declaration span viewport widths without media query breakpoints:
+
+```css
+:root {
+  --text-body:  clamp(1rem, 0.9rem + 0.5vw, 1.125rem);   /* 16–18px */
+  --text-lg:    clamp(1.125rem, 1rem + 0.75vw, 1.375rem); /* 18–22px */
+  --text-xl:    clamp(1.375rem, 1rem + 1.5vw, 2rem);      /* 22–32px */
+  --text-2xl:   clamp(2rem, 1rem + 4vw, 4rem);            /* 32–64px */
+  --text-hero:  clamp(3rem, 1rem + 8vw, 7rem);            /* 48–112px */
+}
+
+body {
+  font-size: var(--text-body);
+  text-wrap: pretty;  /* prevents awkward single-word last lines */
+  line-height: 1.6;
+}
+
+h1 { font-size: var(--text-hero); line-height: 1.05; }
+h2 { font-size: var(--text-2xl);  line-height: 1.15; }
+h3 { font-size: var(--text-xl);   line-height: 1.25; }
+```
+
+The `text-wrap: pretty` property is applied globally — it prevents the typographic issue where a heading or paragraph breaks to leave a single word on the final line, which disrupts reading rhythm.
+
+## The six curated starting points
+
+These pairings are validated combinations of oklch primary colors and font pairs that work well together for specific use cases. Use one as a starting point when the user has provided no brand guidance — it will always produce a more distinct result than Inter + blue.
+
+| Style | Primary color | Font pairing | Best for |
+|---|---|---|---|
+| Modern tech | `oklch(0.55 0.25 250)` blue-violet | Space Grotesk + Inter | SaaS, dev tools, AI products |
+| Elegant editorial | `oklch(0.35 0.10 30)` warm brown | Newsreader + Outfit | Content platforms, blogs, editorial |
+| Premium brand | `oklch(0.20 0.02 250)` near-black | Sora + Plus Jakarta Sans | Luxury, consulting, finance |
+| Lively consumer | `oklch(0.70 0.20 30)` coral | Plus Jakarta Sans + Outfit | E-commerce, lifestyle, social |
+| Minimal professional | `oklch(0.50 0.15 200)` teal-blue | Outfit + Space Grotesk | Data products, dashboards, B2B |
+| Artisan warmth | `oklch(0.55 0.15 80)` caramel | Caveat + Newsreader | Food, education, creative |
+
+<Tip>
+Pick the pairing closest to the project's tone and use it as a starting point — then adjust the oklch hue angle to match the brand. Changing `--primary-h` re-themes the entire palette while the font pairing and scale remain stable.
+</Tip>
+
+### Font personality notes
+
+Each recommended font has a distinct character that should be matched to the project's tone:
+
+<AccordionGroup>
+  <Accordion title="Plus Jakarta Sans — modern, versatile">
+    A contemporary grotesque with strong weight range and geometric character. Works equally well as a heading and body font. Best for interfaces that need to feel current but approachable — consumer apps, marketing pages, e-commerce.
+  </Accordion>
+  <Accordion title="Space Grotesk — technical, distinctive">
+    Has subtle quirks in its letterforms (the leg of the `R`, the tail of the `a`) that give it personality without sacrificing readability. Strong fit for developer tools, technical products, and anything that should feel precise.
+  </Accordion>
+  <Accordion title="Outfit — clean, professional">
+    A clean, highly readable grotesque with a slightly warmer personality than Space Grotesk. Excellent as a body font paired with a more expressive display face. Works well in dashboards and B2B contexts.
+  </Accordion>
+  <Accordion title="Sora — premium, refined">
+    Japanese-influenced proportions give it a slightly condensed, high-quality feel. Works well for brands that want to project premium quality — finance, luxury, consulting. Pairs naturally with Plus Jakarta Sans.
+  </Accordion>
+  <Accordion title="Newsreader — editorial, authoritative">
+    A contemporary serif designed specifically for screen readability at text sizes. Has the authority of a newspaper serif without feeling dated. Strong fit for content-heavy pages, editorial sites, and anything that benefits from a reading experience.
+  </Accordion>
+  <Accordion title="Caveat — handwritten, warm">
+    A casual handwritten style that conveys warmth and humanity. Use sparingly as a display or accent font — never for body text. Effective for food, education, creative portfolios, and brands that want to feel personal and approachable.
+  </Accordion>
+</AccordionGroup>
+
+## Loading fonts from Google Fonts
+
+All recommended fonts are available on Google Fonts. Load only the weights you need to minimize page load time. Most designs require four weights at most: `400` (regular), `500` (medium), `600` (semibold), `700` (bold):
+
+```html
+<!-- Plus Jakarta Sans — heading and UI font -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<!-- Outfit — body and secondary font -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap"
+  rel="stylesheet"
+>
+
+<!-- Combined request for better performance -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600&display=swap"
+  rel="stylesheet"
+>
+```
+
+```css
+:root {
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'Outfit', sans-serif;
+}
+
+body        { font-family: var(--font-body); }
+h1, h2, h3  { font-family: var(--font-display); font-weight: 700; }
+```
+
+## Minimum sizes by context
+
+| Context | Minimum size |
+|---|---|
+| Web body text | `16–18px` |
+| Mobile touch-target labels | `14px` minimum (touch target itself ≥ 44px) |
+| 1920×1080 presentations | Text ≥ `24px`; hero text ideally `64px`+ |
+| Print documents | ≥ `12pt` |
+
+## Combinations to avoid
+
+Beyond the banned font list, avoid these specific combinations that read as generic AI output:
+
+```
+❌  Inter + Roboto + blue buttons
+❌  Fraunces + purple-pink gradients
+❌  More than three font families in one design
+❌  All-caps body text (acceptable for labels and UI elements, never for paragraphs)
+```
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Color and font pairings" icon="swatches" href="/reference/color-font-pairings">
+    Full reference table with oklch values and Google Fonts names for all six starting points.
+  </Card>
+  <Card title="oklch color system" icon="palette" href="/principles/oklch-color-system">
+    How to derive perceptually uniform palettes that pair with these font choices.
+  </Card>
+  <Card title="Anti-AI clichés checklist" icon="ban" href="/principles/anti-ai-cliches">
+    The full blocklist including banned fonts and why they signal AI-generated output.
+  </Card>
+  <Card title="CDN resources" icon="link" href="/reference/cdn-resources">
+    Google Fonts CDN links and other common resources used by the skill.
+  </Card>
+</CardGroup>

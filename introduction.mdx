@@ -1,0 +1,81 @@
+---
+title: "Web Design Skill: AI-powered design taste for any agent"
+description: "Web Design Skill is a structured system prompt that transforms AI-generated HTML from generic to stunning, inspired by Claude Design's visual design philosophy."
+---
+
+Web Design Skill is a reusable skill file for AI coding agents that transforms the design quality of AI-generated web artifacts. Where most AI-generated pages converge on the same tired aesthetic — Inter font, purple-pink gradients, left-border accent cards, emoji as icons — Web Design Skill injects genuine design taste into the agent's decision-making process before a single line of code is written.
+
+## The problem it solves
+
+Modern LLMs can produce functional web pages from simple prompts. But their output tends to converge on the same aesthetic: Inter font, blue primary buttons, purple-pink gradients, large-radius cards, emoji used as icons, and fabricated testimonials. Technically correct, visually generic.
+
+Web Design Skill breaks this pattern by encoding an explicit set of design principles, anti-patterns, and a structured workflow directly into the agent's context — shifting the output from "assembled by AI" to "crafted by a design director."
+
+## Core philosophy
+
+The bar is **stunning, not functional.** Every pixel is intentional, every interaction is deliberate. The skill positions the agent as a top-tier design engineer whose professional identity shifts with each task: UX designer, motion designer, slide designer, prototype engineer, data-visualization specialist. The output medium is always HTML, but the craft standard is always Dribbble/Behance showcase level.
+
+## Compatibility
+
+The skill works with any AI coding agent that reads structured prompt files:
+
+- **Claude Code** — place files in `.agents/skills/web-design-engineer/`
+- **Cursor** — place files in `.agents/skills/web-design-engineer/`
+- **Other agents** — some tools use `.claude/skills/` instead; the content is identical regardless of directory
+
+The agent automatically picks up the skill when your request involves visual or interactive front-end work.
+
+## Where it comes from
+
+This skill is inspired by the system prompt of [Claude Design](https://www.anthropic.com/news/claude-design-anthropic-labs), Anthropic's visual design product launched in April 2026. Claude Design's system prompt (~420 lines) encodes a sophisticated set of design principles, anti-patterns, and workflow constraints that make its output consistently high-quality.
+
+Web Design Skill extracts and refines those core ideas into a portable, open skill that works with any AI coding agent — giving you Claude-Design-level design taste without product lock-in.
+
+## What's included
+
+The skill consists of two files:
+
+- **`SKILL.md`** (~400 lines) — the main skill definition: workflow, design principles, technical specifications, anti-cliché rules, placeholder philosophy, output type guidelines, and the pre-delivery checklist
+- **`references/advanced-patterns.md`** (~520 lines) — a ready-to-use code template library covering slide engines, device frames, the Tweaks panel, animation timeline engines, design canvas layouts, dark mode toggles, data visualization templates, the oklch color system, and the color × font pairing reference
+
+## Key additions beyond Claude Design
+
+This project extends the original Claude Design prompt with six enhancements:
+
+| Addition | What it does |
+|---|---|
+| Design system declaration step | Forces the agent to articulate color, typography, spacing, and motion choices in Markdown before writing any code |
+| v0 draft strategy | A concrete methodology for showing a placeholder-based layout early so you can course-correct before the full build |
+| Extended anti-cliché list | Additional patterns identified from real-world AI output, beyond those in the original prompt |
+| Placeholder philosophy | A complete framework for handling missing assets — icons, images, logos, data — professionally instead of faking them |
+| Color × font pairing table | Six pre-validated visual system starting points that replace the default Inter + #3b82f6 |
+| Advanced pattern library | Ready-to-use code templates for common UI patterns (device frames, slide engine, Tweaks panel, animation timeline) |
+
+## Explore the docs
+
+<Columns cols={2}>
+  <Card title="Get started" icon="rocket" href="/quickstart">
+    Copy the skill files into your project and generate your first high-quality artifact in under five minutes.
+  </Card>
+  <Card title="How it works" icon="gear" href="/how-it-works">
+    Understand the six-step workflow and the mechanisms that make the skill produce consistently great output.
+  </Card>
+  <Card title="Anti-AI clichés" icon="ban" href="/principles/anti-ai-cliches">
+    The explicit blocklist of overused AI design patterns the skill enforces against.
+  </Card>
+  <Card title="oklch color system" icon="palette" href="/principles/oklch-color-system">
+    How perceptually uniform color derivation replaces random hex guessing.
+  </Card>
+  <Card title="Typography and fonts" icon="text" href="/principles/typography-and-fonts">
+    Curated font recommendations and the reasoning behind avoiding Inter, Roboto, and Fraunces.
+  </Card>
+  <Card title="Placeholder philosophy" icon="image" href="/principles/placeholder-philosophy">
+    Why honest placeholders beat poorly drawn fakes for every missing asset.
+  </Card>
+  <Card title="Color × font pairings" icon="swatchbook" href="/reference/color-font-pairings">
+    Six validated visual system starting points for common design contexts.
+  </Card>
+  <Card title="Advanced patterns" icon="code" href="/reference/advanced-patterns">
+    The full code template library: slide engines, device frames, Tweaks panel, and more.
+  </Card>
+</Columns>

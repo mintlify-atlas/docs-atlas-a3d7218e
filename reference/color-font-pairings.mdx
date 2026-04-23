@@ -1,0 +1,157 @@
+---
+title: "Curated color and font pairings for web design"
+description: "Six pre-validated color and font pairings replace Inter and blue defaults with distinctive visual systems for SaaS, editorial, luxury, and consumer contexts."
+---
+
+When the AI has no brand reference, design system, or existing codebase to work from, it falls back to defaults — and the defaults for most AI models are Inter, #3b82f6, and a gradient background. These defaults are so common that they immediately read as "AI-generated." The six curated pairings in Web Design Skill replace that fallback with validated visual systems that have genuine character.
+
+<Note>
+These pairings are **starting points, not hard rules**. As soon as the user provides a brand, design system, or reference site, the agent drops this table and follows their materials instead.
+</Note>
+
+## Why curated pairings
+
+The pairings serve two purposes: avoiding the Inter + #3b82f6 default that signals "AI-assembled," and giving the agent a set of validated starting points that have been tested for aesthetic coherence. Each pairing combines a primary color in the perceptually uniform oklch space with two typefaces that reinforce the same visual personality.
+
+The agent selects a pairing based on the project's use case and industry context when no design context has been provided. Once selected, it uses the oklch color value as the base and derives all other palette colors from it — lighter tints, darker shades, and neutral scales — rather than inventing new hues.
+
+## The six pairings
+
+| Style | Primary color | Fonts | Use case |
+|---|---|---|---|
+| Modern tech | Blue-violet `oklch(0.55 0.25 250)` | Space Grotesk + Inter | SaaS, dev tools, AI products |
+| Elegant editorial | Warm brown `oklch(0.35 0.10 30)` | Newsreader + Outfit | Content platforms, blogs, editorial |
+| Premium brand | Near-black `oklch(0.20 0.02 250)` | Sora + Plus Jakarta Sans | Luxury, consulting, finance |
+| Lively consumer | Coral `oklch(0.70 0.20 30)` | Plus Jakarta Sans + Outfit | E-commerce, lifestyle, social |
+| Minimal professional | Teal-blue `oklch(0.50 0.15 200)` | Outfit + Space Grotesk | Data products, dashboards, B2B |
+| Artisan warmth | Caramel `oklch(0.55 0.15 80)` | Caveat (decorative) + Newsreader | Food & beverage, education, creative |
+
+<Warning>
+Three combinations to avoid regardless of which pairing you choose:
+
+- Inter + Roboto + blue buttons — the peak AI aesthetic
+- Fraunces + purple-pink gradients — overused across AI-generated content
+- More than three font families in one project — creates visual chaos
+</Warning>
+
+## Pairing details
+
+<AccordionGroup>
+  <Accordion title="Modern tech — Space Grotesk + Inter">
+    **Primary:** `oklch(0.55 0.25 250)` — a strong blue-violet that reads as technical and confident.
+
+    Space Grotesk brings a geometric, slightly quirky quality to headings that distinguishes it from the more neutral Inter. Using Inter for body text keeps prose readable and familiar. This pairing works well for developer tools, SaaS dashboards, and AI products where the audience is technical but expects a polished interface.
+  </Accordion>
+
+  <Accordion title="Elegant editorial — Newsreader + Outfit">
+    **Primary:** `oklch(0.35 0.10 30)` — a restrained warm brown that reads as considered and human.
+
+    Newsreader is a high-quality editorial serif with strong italic forms suited to long-form reading. Outfit provides a clean, contemporary sans-serif for UI elements and captions. This pairing suits content platforms, newsletters, and blogs where legibility and intellectual tone are priorities.
+  </Accordion>
+
+  <Accordion title="Premium brand — Sora + Plus Jakarta Sans">
+    **Primary:** `oklch(0.20 0.02 250)` — near-black with a cool undertone, signaling restraint and exclusivity.
+
+    Sora has a refined, geometric quality that works well for luxury and professional contexts. Plus Jakarta Sans handles subheadings and body text with enough visual weight to complement Sora without competing. Use this pairing for finance, consulting, law, and premium consumer brands.
+  </Accordion>
+
+  <Accordion title="Lively consumer — Plus Jakarta Sans + Outfit">
+    **Primary:** `oklch(0.70 0.20 30)` — a warm coral that is energetic without being aggressive.
+
+    Both fonts are modern, approachable, and slightly rounded — which reinforces the friendly, consumer-facing personality. Plus Jakarta Sans at larger weights works well for marketing headlines. Outfit keeps body copy light and readable. Use for e-commerce, lifestyle apps, and social products.
+  </Accordion>
+
+  <Accordion title="Minimal professional — Outfit + Space Grotesk">
+    **Primary:** `oklch(0.50 0.15 200)` — a calm teal-blue associated with clarity and precision.
+
+    Outfit as a primary typeface reads as neutral and modern without the genericness of Inter. Space Grotesk adds just enough technical character for secondary labels and data display. This pairing suits data products, internal dashboards, and B2B tools where the design needs to stay out of the way of the information.
+  </Accordion>
+
+  <Accordion title="Artisan warmth — Caveat + Newsreader">
+    **Primary:** `oklch(0.55 0.15 80)` — a warm caramel that evokes craft, warmth, and authenticity.
+
+    Caveat is a handwritten display font suited to decorative headlines, pull quotes, and accent text — use it sparingly. Newsreader handles the main editorial content with authority. This pairing works for food and beverage brands, education products, and creative portfolios where a human, artisanal feel is the goal.
+  </Accordion>
+</AccordionGroup>
+
+## oklch-based color derivation
+
+The primary colors are specified in oklch rather than hex or HSL. oklch is perceptually uniform: the same lightness value produces colors that appear equally bright to the human eye across all hues, which means derived colors from a single base stay visually consistent.
+
+When the agent selects a pairing, it uses the primary oklch value to derive the full palette:
+
+```css
+:root {
+  --primary-h: 250; /* hue from the selected pairing */
+  --primary:       oklch(0.55 0.25 var(--primary-h));
+  --primary-light: oklch(0.75 0.15 var(--primary-h));
+  --primary-dark:  oklch(0.35 0.20 var(--primary-h));
+
+  /* Neutral scale at the same hue — keeps the palette coherent */
+  --gray-100: oklch(0.96 0.004 var(--primary-h));
+  --gray-500: oklch(0.55 0.014 var(--primary-h));
+  --gray-900: oklch(0.21 0.014 var(--primary-h));
+}
+```
+
+Only the `--primary-h` value changes between pairings. The lightness and chroma parameters are kept consistent, which makes palette swapping a single-variable change. This is why the agent never invents new hues from scratch when more colors are needed — it derives them from the same hue axis.
+
+## Loading fonts via Google Fonts
+
+All fonts in the pairings table are available on Google Fonts. Load them in the `<head>` of your HTML file before any CSS that references them:
+
+```html
+<!-- Modern tech -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Elegant editorial -->
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;1,400&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Premium brand -->
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Lively consumer -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Minimal professional -->
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Artisan warmth -->
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Newsreader:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+```
+
+<Tip>
+Always include `display=swap` to prevent invisible text during font load. Load only the weights you actually use — including all weights adds unnecessary latency.
+</Tip>
+
+## Requesting a specific pairing in your prompt
+
+You can request a specific pairing directly:
+
+- **"Use the artisan warmth pairing"** — the agent picks Caveat + Newsreader and the caramel primary
+- **"I want something editorial and warm"** — the agent selects the most appropriate match (likely Elegant editorial or Artisan warmth)
+- **"Minimal, data-focused"** — steers toward Minimal professional (Outfit + Space Grotesk)
+- **"Premium, understated"** — maps to Premium brand (Sora + Plus Jakarta Sans)
+
+You can also mix elements from different pairings by describing the combination:
+
+> "Use the Newsreader + Outfit font pair but with a teal primary color."
+
+In that case the agent treats your specification as the design context and does not consult the pairings table at all.
+
+## Choosing a pairing for your use case
+
+<Columns cols={2}>
+  <Card title="Building a SaaS or dev tool?" icon="code">
+    Start with Modern tech. The blue-violet primary reads as technical and confident, and Space Grotesk adds just enough personality to avoid Inter-fatigue without alienating technical audiences.
+  </Card>
+  <Card title="Content-first site or blog?" icon="book-open">
+    Elegant editorial gives long-form content the typographic quality it deserves. Newsreader's italic forms are particularly effective for pull quotes and article intros.
+  </Card>
+  <Card title="Dashboard or internal tool?" icon="chart-bar">
+    Minimal professional keeps visual noise low and lets data take center stage. The teal-blue primary adds enough color to aid navigation without becoming a distraction.
+  </Card>
+  <Card title="E-commerce or consumer app?" icon="shopping-bag">
+    Lively consumer's coral primary creates immediate warmth and energy. Plus Jakarta Sans at heavy weights makes marketing headlines feel approachable rather than corporate.
+  </Card>
+</Columns>

@@ -1,0 +1,146 @@
+---
+title: "CDN resources and library recommendations"
+description: "Web Design Skill recommends specific CDN-loaded libraries for charts, fonts, and React — with pinned versions for React and Babel to prevent breaking changes."
+---
+
+Web Design Skill's default stance on external libraries is conservative: hand-written CSS is always preferred over utility frameworks, and CDN resources are only loaded when the scenario clearly calls for them. This keeps artifacts lean, self-contained, and free from version drift — except for the one case where exact versions are non-negotiable.
+
+## Default approach
+
+Every artifact starts with hand-written CSS using custom properties for design tokens. This approach gives the agent full control over the visual output and avoids the class-name pollution and specificity conflicts that come with utility frameworks. CDN libraries are an addition to a complete CSS foundation, not a replacement for it.
+
+<Note>
+The only exception to the "load only what you need" rule is React + Babel. Those two scripts must be loaded for any JSX-based prototype, and **they must use exactly the pinned versions below**.
+</Note>
+
+---
+
+## React and Babel — pinned versions (critical)
+
+When building React prototypes with inline JSX, always use these exact CDN scripts with the specified integrity hashes. Do not update the version numbers without re-testing — React and Babel CDN releases have introduced breaking changes with the inline Babel transpilation pipeline in the past.
+
+```html
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+        integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+        integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+        integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+        crossorigin="anonymous"></script>
+```
+
+<Warning>
+**Do not add `type="module"` to React CDN script tags.** The module type breaks the Babel transpilation pipeline when using inline `<script type="text/babel">` blocks. The three scripts above must be loaded in order — React, then ReactDOM, then Babel — before any component files.
+</Warning>
+
+The integrity hashes are recommended but can be removed if the CDN is behind a proxy or the network environment rejects SRI checks.
+
+---
+
+## Use when the scenario clearly requires it
+
+These libraries add meaningful capability but should only be loaded when the task explicitly involves the feature they provide.
+
+### Data visualization
+
+```html
+<!-- Standard charts: line, bar, pie, doughnut, radar -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Complex custom visualizations that Chart.js cannot express -->
+<script src="https://d3js.org/d3.v7.min.js"></script>
+```
+
+Chart.js covers the vast majority of dashboard use cases. Load D3.js only when the visualization requires custom layouts (force-directed graphs, hierarchical layouts, geographic maps) that Chart.js does not support.
+
+### Typography via Google Fonts
+
+```html
+<!-- Example: Plus Jakarta Sans for a consumer product -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+```
+
+Always avoid loading Inter, Roboto, Arial, Fraunces, or system-ui — these are the fonts most associated with default AI output. See [Color and font pairings](/reference/color-font-pairings) for the full list of recommended typefaces and their Google Fonts names.
+
+---
+
+## Use only when explicitly requested or for quick throwaway prototypes
+
+These libraries trade design system control for development speed. They are appropriate when the user explicitly asks for them or when the deliverable is a rough prototype that will be discarded.
+
+### Tailwind CSS
+
+```html
+<script src="https://cdn.tailwindcss.com"></script>
+```
+
+<Warning>
+Tailwind CSS conflicts with the design-tokens-first workflow that SKILL.md prescribes. When Tailwind utility classes drive layout and color, the agent cannot declare a coherent design system in CSS custom properties first and then implement it consistently. Use hand-written CSS with custom properties for any deliverable that needs to look polished or be maintained.
+</Warning>
+
+Tailwind is acceptable for quick, throwaway prototypes where the goal is speed over visual quality — for example, a rough wireframe to validate a flow before a proper build.
+
+### Lucide icons
+
+```html
+<script src="https://unpkg.com/lucide@latest"></script>
+```
+
+Load Lucide only when the user specifies they want icons from this library, or when the design system being implemented already uses Lucide. When no icon library is available, the correct approach is to use placeholder markers (`[icon]` or simple geometric shapes) rather than inserting icons to "look complete."
+
+---
+
+## Libraries to avoid altogether
+
+These libraries introduce bundle-size overhead, version-compatibility issues, or problems with React 18's inline Babel mode that make them unsuitable for the CDN-based, single-file delivery format.
+
+<AccordionGroup>
+  <Accordion title="Framer Motion">
+    Framer Motion is designed for a bundler-based React workflow. Its CDN build is large and has known compatibility issues with React 18 when transpiled inline by Babel standalone. Use the custom animation timeline engine from [advanced-patterns.md](/reference/advanced-patterns#animation-timeline-engine) instead — it covers all animation use cases without the overhead.
+  </Accordion>
+
+  <Accordion title="GSAP">
+    GSAP's licensing terms require a paid plan for commercial use beyond the free tier. Its API surface also adds significant complexity for the single-file delivery format. CSS transitions, the `useTime` timeline engine, or Popmotion (as a last resort) cover the same range of motion needs.
+  </Accordion>
+
+  <Accordion title="Lottie">
+    Lottie requires pre-exported JSON animation files, which are not practical in a single-HTML-file workflow. Lottie's CDN bundle is also large relative to the motion it adds. Produce animations in CSS or with the custom timeline engine instead.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Last-resort animation fallback: Popmotion
+
+If CSS transitions, React state, and the custom timeline engine genuinely cannot cover a motion requirement, Popmotion is the approved fallback:
+
+```html
+<script src="https://unpkg.com/popmotion@11.0.5/dist/popmotion.min.js"></script>
+```
+
+Popmotion is small, has no external dependencies, and works reliably with the CDN-based delivery format. Use it only when the above three animation tiers have been exhausted.
+
+---
+
+## Summary
+
+<Columns cols={2}>
+  <Card title="Always load for React" icon="react">
+    React 18.3.1 + ReactDOM 18.3.1 + Babel 7.29.0 — exact versions, in order, no `type="module"`.
+  </Card>
+  <Card title="Load when clearly needed" icon="check">
+    Chart.js, D3.js v7, Google Fonts (non-default typefaces only).
+  </Card>
+  <Card title="Load when explicitly requested" icon="question-mark-circle">
+    Tailwind CSS (quick prototypes only), Lucide icons (when specified).
+  </Card>
+  <Card title="Avoid entirely" icon="x-mark">
+    Framer Motion, GSAP, Lottie. Use the built-in animation layers instead.
+  </Card>
+</Columns>
+
+<Tip>
+For animation, exhaust the four built-in tiers before reaching for any external library: CSS transitions → React state + `setTimeout`/`requestAnimationFrame` → custom `useTime` timeline engine → Popmotion fallback.
+</Tip>

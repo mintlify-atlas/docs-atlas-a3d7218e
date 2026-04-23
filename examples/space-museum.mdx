@@ -1,0 +1,118 @@
+---
+title: "Demo: Space Exploration Museum homepage"
+description: "Same prompt, two outputs: oklch tokens vs. hardcoded hex, editorial grid vs. standard sections — a direct before-and-after of Web Design Skill in action."
+---
+
+This demo uses a single, identical prompt submitted to an AI agent twice — once without the skill and once with it — to show what the skill actually changes. The output isn't just "better looking." It represents a fundamentally different set of design decisions: how colors are derived, how type is chosen, how sections relate to one another on the page.
+
+## The prompt
+
+<Note>
+"Build a homepage for a fictional 'Space Exploration Museum' — full-screen hero, 4 exhibition sections, a timeline with 6+ milestones, a booking CTA, and a footer. Deep, immersive, cosmic feel."
+</Note>
+
+The prompt is intentionally brief and open-ended. It provides a topic, a structure, and a mood. Everything else — color, typography, layout rhythm, detail treatment — is left to the agent's judgment. That judgment is exactly what the skill shapes.
+
+## Side-by-side comparison
+
+| | Without skill | With skill |
+|---|---|---|
+| **Color system** | Hardcoded hex values (`#7cf0ff`, `#b388ff`) | oklch-based token system with CSS custom properties |
+| **Typography** | Orbitron + Noto Serif SC | Instrument Serif + Space Grotesk + JetBrains Mono |
+| **Layout** | Standard landing-page structure | Editorial magazine-style layout with grid compositions |
+| **Details** | Heavy glow effects, neon gradients | Restrained palette, typographic hierarchy, decorative data elements |
+| **Overall feel** | Enthusiastic junior designer | Experienced design director |
+
+## What changed, and why it matters
+
+<AccordionGroup>
+  <Accordion title="Color: from hardcoded hex to oklch tokens">
+    Without the skill, the agent picks hex values that feel intuitively "space-like" — bright cyan (`#7cf0ff`), violet (`#b388ff`) — and hard-codes them throughout the stylesheet. This creates two problems.
+
+    First, the values are perceptually inconsistent. In HSL, a 50% lightness cyan looks noticeably brighter to the human eye than a 50% lightness violet. The resulting palette feels unbalanced even when the numbers look similar.
+
+    Second, hard-coded hex values create a maintenance burden. Changing the primary color means hunting through the file for every usage.
+
+    With the skill, colors are derived in the `oklch()` color space — perceptually uniform, so equal lightness values actually *look* equally bright across hues. Tokens are declared once as CSS custom properties (`--color-surface`, `--color-ink`, `--color-accent`) and referenced throughout. The palette reads as intentional because it *is* intentional.
+
+    See the [oklch color system guide](/principles/oklch-color-system) for the full derivation method.
+  </Accordion>
+
+  <Accordion title="Typography: from sci-fi cliché to editorial pairing">
+    Orbitron is the default "space font" in AI-generated output — recognizable, overused, and immediately readable as a template choice. Paired with Noto Serif SC, it produces a mismatch between a geometric display face and a CJK-optimized serif that were never designed to work together.
+
+    With the skill, the typography is chosen as a system: Instrument Serif for display headings (warm, editorial, with strong italic character), Space Grotesk for UI elements and body text (geometric but humanist, with enough personality to carry navigation and labels), and JetBrains Mono for data elements and technical callouts. Each face has a role. The combination creates hierarchy without contrast for its own sake.
+
+    The skill also enforces a type-scale ratio — a 4–6× difference between h1 and body text — that produces the kind of bold proportion seen in editorial magazine layouts rather than the uniform sizing typical of AI-generated landing pages.
+
+    See the [typography and fonts guide](/principles/typography-and-fonts) for pairing recommendations and the banned fonts list.
+  </Accordion>
+
+  <Accordion title="Layout: from standard sections to editorial grid">
+    Without the skill, the layout follows the default landing-page grammar: full-width hero, then alternating text-left / image-right sections, then a timeline, then a CTA block. Each section is a self-contained rectangle. The page reads as a vertical stack of boxes.
+
+    With the skill, the layout treats the page as an editorial surface. Sections overlap through the z-axis, grid compositions break the implicit column grid, and the timeline uses a horizontal editorial strip rather than a vertical bullet list. The booking CTA is integrated into the last exhibition section rather than isolated as a separate component.
+
+    This is the difference between a page that was assembled and a page that was designed.
+  </Accordion>
+
+  <Accordion title="Details: from glow to restraint">
+    Heavy glow effects (`box-shadow: 0 0 60px #7cf0ff`, `text-shadow: 0 0 20px #b388ff`) are the detail-level equivalent of the purple-pink gradient: a shortcut to "dramatic" that reads as inexperienced. They also create accessibility issues, as glowing text reduces contrast against dark backgrounds.
+
+    With the skill, the "cosmic feel" of the prompt is achieved through restraint rather than excess: a near-black background with a single restrained accent derived in oklch, typographic hierarchy that creates depth without visual noise, and decorative data elements (coordinates, mission timestamps, catalog numbers) that add texture without demanding attention.
+
+    These details signal a design director who trusts the composition — not a junior designer adding effects to fill space.
+  </Accordion>
+</AccordionGroup>
+
+## Design principles demonstrated
+
+<Columns cols={2}>
+  <Card title="Anti-AI clichés" icon="ban" href="/principles/anti-ai-cliches">
+    How the skill avoids the patterns — neon gradients, Orbitron, hard-coded hex — that mark output as AI-generated.
+  </Card>
+  <Card title="oklch color system" icon="palette" href="/principles/oklch-color-system">
+    Why perceptually uniform color derivation produces more balanced palettes than picking hex values by eye.
+  </Card>
+  <Card title="Typography and fonts" icon="type" href="/principles/typography-and-fonts">
+    The pairing logic behind Instrument Serif + Space Grotesk and how to choose type systems for editorial projects.
+  </Card>
+  <Card title="Design system declaration" icon="file-text" href="/workflow/design-system-declaration">
+    The step where tokens are declared in plain language before any code is written — the source of the skill's consistency.
+  </Card>
+</Columns>
+
+## What to look for when comparing outputs
+
+When evaluating skill vs. no-skill output on a prompt like this, look for these signals:
+
+**Color signals**
+- Are the values hard-coded hex or CSS custom properties?
+- Does the palette use multiple saturated hues simultaneously (no-skill) or a controlled token set (skill)?
+- Does equal-lightness text actually look equally bright across colors?
+
+**Typography signals**
+- Is the heading font a recognizable AI default (Orbitron, Inter, Roboto) or a purposeful editorial choice?
+- Is there a consistent type scale with clear hierarchy, or do heading sizes feel arbitrary?
+- Are different font roles assigned to display, UI, and data elements?
+
+**Layout signals**
+- Does the page read as a vertical stack of independent sections, or as a composed editorial surface?
+- Are sections separated only by whitespace, or does the layout create visual relationships between them?
+- Does the timeline use a default bullet-list pattern or a designed structure?
+
+**Detail signals**
+- Are effects (glow, shadow, gradient) applied to create drama, or is drama achieved through composition and restraint?
+- Do decorative elements add texture and context, or are they filler?
+
+## Try it yourself
+
+The most direct way to see the skill's effect is to submit the same prompt to your AI agent twice — once with the skill installed and once without. Use the museum prompt above, or adapt it to a different context:
+
+<Tip>
+For the clearest comparison, keep the prompt identical between runs. The skill's influence should be visible in the design system declaration it produces in step 3 of the workflow — before any code is written.
+</Tip>
+
+The prompt structure that works well for this kind of test: a named subject, a list of required sections, and a mood adjective. Brief enough to leave design decisions open; specific enough to force comparable structure between runs.
+
+Related: the [photographer portfolio demo](/examples/photographer-portfolio) shows what the skill produces when given an even shorter, more open-ended prompt — one sentence with no section requirements.
